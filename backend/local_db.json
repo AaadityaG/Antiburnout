@@ -749,10 +749,17 @@
           "model": "openai/gpt-4o-mini",
           "provider_key": "model_1",
           "timestamp": "2026-07-24 08:15:54.062631"
+        },
+        {
+          "message": "[KB: kb-burnout-tips.md]",
+          "response": "It seems I wasn't able to find a specific definition of \"Cynicism\" in your knowledge base document \"kb-burnout-tips.md.\" However, I did find related content in another document regarding burnout and narcissism.\n\nIf you're looking for specific details or tips related to burnout, please let me know!",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-24 09:08:55.305838"
         }
       ],
       "created_at": "2026-07-24 08:00:56.741308",
-      "updated_at": "2026-07-24 08:15:54.062661"
+      "updated_at": "2026-07-24 09:08:55.305867"
     },
     {
       "id": "d4be0eda-d872-409e-afa2-9f03a21af9a6",
@@ -764,10 +771,46 @@
           "model": "openai/gpt-4o-mini",
           "provider_key": "model_1",
           "timestamp": "2026-07-24 09:00:20.002212"
+        },
+        {
+          "message": "what are the all docs access you have",
+          "response": "Would you like me to check your knowledge base for that?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-24 09:01:12.126530"
+        },
+        {
+          "message": "yes",
+          "response": "You have access to the following documents in your knowledge base:\n\n1. **kb-burnout-tips.md**\n   - Type: Markdown\n   - Page Count: 1\n\n2. **Burnout-35-years-of-research-and-practice.pdf**\n   - Type: PDF\n   - Page Count: 18\n   - Overview: Focuses on research in occupational health psychology, job stress, and burnout.\n\n3. **effective-strategies-for-burnout-prevention-in-the-workplace-a-comprehensive-approach.pdf**\n   - Type: PDF\n   - Page Count: 2\n\nIf you need specific information from any of these documents, just let me know!",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-24 09:01:19.674908"
         }
       ],
       "created_at": "2026-07-24 09:00:20.002216",
-      "updated_at": "2026-07-24 09:00:20.002217"
+      "updated_at": "2026-07-24 09:01:19.674927"
+    },
+    {
+      "id": "1988c3b4-ec32-4bc6-9c05-0b71b329e805",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "[KB: kb-burnout-tips.md]",
+          "response": "Would you like me to check your knowledge base for that?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-24 09:09:08.923403"
+        },
+        {
+          "message": "everything",
+          "response": "Here's what I found for you:\n\n### Knowledge Base:\n1. **Burnout Tips (kb-burnout-tips.md)**:\n   - Focus on gradual relaxation: Start from your toes and work up to your head (10 minutes).\n   - Cognitive reframing strategies to shift negative thoughts.\n   - Digital detox recommendations: No screens for a defined period.\n\n2. **Burnout Research (Burnout-35-years-of-research-and-practice.pdf)**:\n   - Discusses the imbalance of demands over resources contributing to burnout.\n\n### User Activity:\n- **Total Sessions**: 12\n- **Focus Time**: Approximately 138.2 minutes\n- **Breaks Taken**: 12\n- **Breaks Skipped**: 8 (100% compliance on breaks taken)\n\n### Break Settings:\n- **Break Interval**: Every 30 minutes\n- **Break Duration**: Approximately 5 minutes\n- **Auto-Start**: Enabled\n\nWould you like to explore any specific tip or further information from your documents?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-24 09:09:26.538054"
+        }
+      ],
+      "created_at": "2026-07-24 09:09:08.923416",
+      "updated_at": "2026-07-24 09:09:26.538064"
     }
   ],
   "activity": [

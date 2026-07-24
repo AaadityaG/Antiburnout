@@ -595,21 +595,6 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
                 )}
 
                 <button
-                  className={`w-9 h-9 rounded-full border flex items-center justify-center cursor-pointer transition-all ${
-                    kbOpen
-                      ? 'bg-accent/20 border-accent/30 text-accent'
-                      : 'bg-glass glass-blur border-white/20 text-white hover:bg-accent hover:text-primary'
-                  }`}
-                  onClick={() => setKbOpen(!kbOpen)}
-                  title="Knowledge Base"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                  </svg>
-                </button>
-
-                <button
                   className="w-9 h-9 rounded-full bg-glass glass-blur border border-white/20 text-white flex items-center justify-center hover:bg-accent hover:text-primary cursor-pointer"
                   onClick={onClose}
                 >
@@ -676,8 +661,6 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
                                 {tool === 'get_user_break_settings' && '⏰ Schedule fetched'}
                                 {tool === 'get_break_tip' && '💡 Tip generated'}
                                 {tool === 'recommend_music' && '🎵 Music recommended'}
-                                {tool === 'kb_search' && '📚 Knowledge base searched'}
-                                {!['check_system_settings', 'get_user_activity', 'get_user_break_settings', 'get_break_tip', 'recommend_music', 'kb_search'].includes(tool) && `🔧 ${tool}`}
                                 {tool === 'kb_search' && '📚 Knowledge base searched'}
                                 {!['check_system_settings', 'get_user_activity', 'get_user_break_settings', 'get_break_tip', 'recommend_music', 'kb_search'].includes(tool) && `🔧 ${tool}`}
                               </span>
@@ -1025,8 +1008,6 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
           </motion.div>
         </motion.div>
       )}
-
-      <KnowledgeBase isOpen={kbOpen} onClose={() => setKbOpen(false)} />
 
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
