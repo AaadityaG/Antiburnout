@@ -4,6 +4,7 @@ import settingsReducer from './settingsSlice'
 import chatReducer from './chatSlice'
 import tipReducer from './tipSlice'
 import activityReducer from './activitySlice'
+import kbReducer from './kbSlice'
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     settings: settingsReducer,
     chat: chatReducer,
     tips: tipReducer,
-    activity: activityReducer
+    activity: activityReducer,
+    kb: kbReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useSelector, useDispatch } from 'react-redux'
 import type { RootState, AppDispatch } from '../store'
 import { fetchSessions, fetchSessionMessages, deleteSession, clearAllHistory, searchChatHistory, clearSearchResults } from '../store/chatSlice'
+import { fetchKBDocuments } from '../store/kbSlice'
 import axios from 'axios'
 import ConfirmDialog from './ConfirmDialog'
 import HoverLabel from './HoverLabel'
+import KnowledgeBase from './KnowledgeBase'
 
 const API_URL = import.meta.env.VITE_API_URL 
 
@@ -20,6 +22,7 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
   const { token } = useSelector((state: RootState) => state.auth)
   const { sessions, isLoading } = useSelector((state: RootState) => state.chat)
   const { searchResults, isSearching } = useSelector((state: RootState) => state.chat)
+  const { documents: kbDocuments } = useSelector((state: RootState) => state.kb)
   const user = useSelector((state: RootState) => state.auth.user)
   
   const [messages, setMessages] = useState<Array<{
@@ -52,6 +55,9 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
     onConfirm: () => {},
     variant: 'primary'
   })
+  const [kbOpen, setKbOpen] = useState(false)
+  const [showKbDropdown, setShowKbDropdown] = useState(false)
+  const [kbFilter, setKbFilter] = useState('')
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -62,6 +68,7 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
   useEffect(() => {
     if (isOpen && token) {
       dispatch(fetchSessions(token))
+      dispatch(fetchKBDocuments(token))
     }
   }, [isOpen, token, dispatch])
 
@@ -267,9 +274,44 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSend()
+      if (showKbDropdown) {
+        setShowKbDropdown(false)
+      } else {
+        handleSend()
+      }
+    }
+    if (e.key === 'Escape' && showKbDropdown) {
+      setShowKbDropdown(false)
     }
   }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setInput(value)
+    
+    if (value === '/kb') {
+      setShowKbDropdown(true)
+      setKbFilter('')
+    } else if (value.startsWith('/kb ')) {
+      setShowKbDropdown(true)
+      setKbFilter(value.slice(4).toLowerCase())
+    } else {
+      setShowKbDropdown(false)
+    }
+  }
+
+  const handleKbDocSelect = (filename: string) => {
+    setInput(`[KB: ${filename}] `)
+    setShowKbDropdown(false)
+    inputRef.current?.focus()
+  }
+
+  const filteredKbDocs = useMemo(() => {
+    if (!kbFilter) return kbDocuments
+    return kbDocuments.filter(doc => 
+      doc.filename.toLowerCase().includes(kbFilter)
+    )
+  }, [kbDocuments, kbFilter])
 
   const handleSemanticSearch = (query: string) => {
     setSearchQuery(query)
@@ -561,6 +603,11 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
               </div>
             </header>
 
+            {/* Messages or Knowledge Base */}
+            {kbOpen ? (
+              <KnowledgeBase onBack={() => setKbOpen(false)} />
+            ) : (
+              <>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
               {messages.length === 0 ? (
@@ -614,7 +661,8 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
                                 {tool === 'get_user_break_settings' && '⏰ Schedule fetched'}
                                 {tool === 'get_break_tip' && '💡 Tip generated'}
                                 {tool === 'recommend_music' && '🎵 Music recommended'}
-                                {!['check_system_settings', 'get_user_activity', 'get_user_break_settings', 'get_break_tip', 'recommend_music'].includes(tool) && `🔧 ${tool}`}
+                                {tool === 'kb_search' && '📚 Knowledge base searched'}
+                                {!['check_system_settings', 'get_user_activity', 'get_user_break_settings', 'get_break_tip', 'recommend_music', 'kb_search'].includes(tool) && `🔧 ${tool}`}
                               </span>
                             ))}
                           </div>
@@ -876,38 +924,89 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
 
             {/* Input */}
             <div className="px-6 py-4 border-t border-white/5">
-              <div className="flex gap-3">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-base text-white focus:outline-none focus:border-accent/50 placeholder:text-white/20"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Type your message..."
-                />
-                <HoverLabel label="New Chat" position="top">
+              <div className="relative">
+                <AnimatePresence>
+                  {showKbDropdown && filteredKbDocs.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute bottom-full left-0 right-0 mb-2 bg-bg-dark border border-white/10 rounded-xl shadow-xl overflow-hidden z-50"
+                    >
+                      <div className="px-3 py-2 border-b border-white/5">
+                        <p className="text-[11px] text-white/40 uppercase tracking-wider">Knowledge Base Documents</p>
+                      </div>
+                      <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                        {filteredKbDocs.map((doc) => (
+                          <button
+                            key={doc.doc_id}
+                            onClick={() => handleKbDocSelect(doc.filename)}
+                            className="w-full text-left px-4 py-2.5 hover:bg-white/5 flex items-center gap-3 transition-colors"
+                          >
+                            <span className={`text-[10px] font-bold tracking-wider ${
+                              doc.file_type === 'pdf' ? 'text-red-400' :
+                              doc.file_type === 'md' ? 'text-purple-400' : 'text-blue-400'
+                            }`}>
+                              {doc.file_type.toUpperCase()}
+                            </span>
+                            <span className="text-sm text-white/70 truncate">{doc.filename}</span>
+                            <span className="text-[10px] text-white/30 ml-auto">{doc.total_chunks} chunks</span>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div className="flex gap-3 items-center">
+                  <HoverLabel label="Knowledge Base" position="top">
+                    <button
+                      className={`w-12 h-12 rounded-full border flex items-center justify-center cursor-pointer transition-all shrink-0 ${
+                        kbOpen
+                          ? 'bg-accent/20 border-accent/30 text-accent'
+                          : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80'
+                      }`}
+                      onClick={() => setKbOpen(!kbOpen)}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                      </svg>
+                    </button>
+                  </HoverLabel>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-base text-white focus:outline-none focus:border-accent/50 placeholder:text-white/20"
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder={showKbDropdown ? "Filter documents..." : "Type your message... (try /kb)"}
+                  />
+                  <HoverLabel label="New Chat" position="top">
+                    <button
+                      className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-white/60 flex items-center justify-center hover:bg-white/10 hover:text-white cursor-pointer shrink-0 transition-all"
+                      onClick={startNewChat}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                      </svg>
+                    </button>
+                  </HoverLabel>
                   <button
-                    className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-white/60 flex items-center justify-center hover:bg-white/10 hover:text-white cursor-pointer shrink-0 transition-all"
-                    onClick={startNewChat}
+                    className="h-12 rounded-full bg-glass glass-blur border border-white/20 text-white font-medium px-6 hover:bg-accent hover:text-primary cursor-pointer shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                    onClick={() => handleSend()}
+                    disabled={!input.trim() || isTyping}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
+                    Send
                   </button>
-                </HoverLabel>
-                <button
-                  className="h-12 rounded-full bg-glass glass-blur border border-white/20 text-white font-medium px-6 hover:bg-accent hover:text-primary cursor-pointer shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-                  onClick={() => handleSend()}
-                  disabled={!input.trim() || isTyping}
-                >
-                  Send
-                </button>
+                </div>
               </div>
             </div>
+              </>
+            )}
           </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
       )}
 
       <ConfirmDialog

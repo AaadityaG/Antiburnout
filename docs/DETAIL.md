@@ -185,6 +185,11 @@ backend/
 │   ├── vector_store.py        # ChromaDB + embeddings + chunking
 │   └── chroma_db/             # Persistent vector storage
 │
+├── kb/                        # Knowledge Base (personal docs)
+│   ├── extractor.py           # Text extraction (PDF, TXT, MD)
+│   ├── vector_store.py        # ChromaDB per-user KB collection
+│   └── routes.py              # Upload, list, delete, search endpoints
+│
 └── services/                  # Business logic
     ├── encryption.py          # Fernet encrypt/decrypt for API keys
     └── agent_runner.py        # LangGraph agent orchestration
@@ -214,6 +219,7 @@ desk-app/
 │   ├── components/            # UI overlays
 │   │   ├── ChatOverlay.tsx    # AI chat with sidebar + semantic search
 │   │   ├── BreakView.tsx      # Full-screen break view
+│   │   ├── KnowledgeBase.tsx  # Personal document KB panel
 │   │   ├── SettingsOverlay.tsx
 │   │   ├── ProfileOverlay.tsx
 │   │   ├── MusicOverlay.tsx
@@ -226,7 +232,8 @@ desk-app/
 │   │   ├── chatSlice.ts       # Chat sessions + search
 │   │   ├── settingsSlice.ts   # Break settings
 │   │   ├── activitySlice.ts   # Activity tracking
-│   │   └── tipSlice.ts        # Break tips
+│   │   ├── tipSlice.ts        # Break tips
+│   │   └── kbSlice.ts         # Knowledge base state
 │   │
 │   └── types/                 # TypeScript declarations
 │
@@ -313,6 +320,7 @@ User message
 | `get_user_break_settings` | Get user's configured break preferences | No (always show) |
 | `get_break_tip` | Return wellness tip from curated library | When user says "set up breaks" |
 | `recommend_music` | Map mood → YouTube music search | When user says "play music" |
+| `kb_search` | Search user's uploaded documents (PDF/TXT/MD) | When user asks about their docs |
 
 ### Tool Execution Modes
 
@@ -382,6 +390,65 @@ Full exchange (800 words):
 | Embedding device | CPU |
 | Normalization | Enabled (cosine similarity) |
 | Telemetry | Disabled |
+
+---
+
+## Knowledge Base (Personal Document RAG)
+
+Users can upload PDF, TXT, and MD files to their personal knowledge base. The agent can then search these documents when answering questions.
+
+### Upload Flow
+
+```
+User → POST /kb/upload (PDF/TXT/MD file)
+  ↓
+Extract text (PyMuPDF for PDF, plain read for TXT/MD)
+  ↓
+Strip markdown syntax (MD files only)
+  ↓
+Chunk (300 words, 50 overlap — same as chat RAG)
+  ↓
+Embed (all-MiniLM-L6-v2, same model)
+  ↓
+Store in ChromaDB: kb_{user_id} collection
+  ↓
+Return: doc_id, filename, chunk_count, char_count
+```
+
+### Search Flow
+
+```
+Agent calls kb_search(query) → tool embeds query
+  ↓
+Cosine similarity in kb_{user_id}
+  ↓
+Group results by doc_id (combine chunks from same file)
+  ↓
+Return: filename, content excerpt, relevance score
+```
+
+### KB API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/kb/upload` | Upload PDF/TXT/MD → extract → chunk → embed → store |
+| GET | `/kb/documents` | List user's uploaded documents |
+| DELETE | `/kb/documents/{doc_id}` | Delete document + all its chunks |
+| POST | `/kb/search` | Semantic search across user's knowledge base |
+
+### KB Storage
+
+- ChromaDB collection: `kb_{user_id}` (isolated per user)
+- Each chunk metadata: `doc_id`, `filename`, `file_type`, `chunk_index`, `total_chunks`, `page_count`
+- No file storage — only extracted text is kept in vectors
+
+### KB Frontend
+
+- **KnowledgeBase.tsx** component embedded in ChatOverlay
+- Toggle via book icon in chat header
+- Shows uploaded files with delete buttons
+- File upload via drag-and-drop or click
+- Supported: PDF, TXT, MD
 
 ---
 

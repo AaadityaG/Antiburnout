@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import device_auth, settings, chat, chat_history, tips, activity, agent, music
+from kb import kb_router
 
 app = FastAPI(
     title="AntiBurnout API",
@@ -26,6 +27,7 @@ app.include_router(tips.router)
 app.include_router(activity.router)
 app.include_router(agent.router)
 app.include_router(music.router)
+app.include_router(kb_router)
 
 @app.get("/")
 async def root():

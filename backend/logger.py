@@ -38,6 +38,12 @@ STRUCTURED_FIELDS = [
     "result_count", "recommendation_count", "tools_used",
     "message_length", "history_turns", "path", "device",
     "k", "top_score", "collection", "error",
+    "upload_filename", "content_type", "file_size_kb", "doc_id",
+    "file_type", "chars", "words", "pages", "total_pages",
+    "pages_with_text", "empty_pages", "extract_ms", "store_ms",
+    "embed_ms", "search_ms", "fetch_ms", "delete_ms",
+    "chunk_size", "chunk_overlap", "total_chunks", "chunks_deleted",
+    "raw_results", "unique_docs", "doc_count", "chars_stripped",
 ]
 
 
@@ -130,7 +136,7 @@ class StructuredFormatter(logging.Formatter):
             pairs = " ".join(_format_value(k, v) for k, v in extras.items())
             parts.append(f"  {pairs}")
 
-        if record.exc_info and record.exc_info[0]:
+        if record.exc_info and isinstance(record.exc_info, tuple) and record.exc_info[0]:
             parts.append(f"  exception={record.exc_info[0].__name__}: {record.exc_info[1]}")
 
         return "".join(parts)

@@ -46,3 +46,6 @@ Thumbs.db
 
 # RAG vector store
 rag/chroma_db/
+
+# Knowledge Base vector store
+kb/chroma_db/

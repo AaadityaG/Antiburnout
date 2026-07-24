@@ -85,7 +85,7 @@ VITE_API_URL=http://localhost:8000
 
 ## Documentation
 
-- **[Architecture & Features](DETAIL.md)** — full system design, all features, tech stack, API reference
+- **[Architecture & Features](docs/DETAIL.md)** — full system design, all features, tech stack, API reference
 
 ---
 

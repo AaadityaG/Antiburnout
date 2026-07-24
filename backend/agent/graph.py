@@ -33,8 +33,9 @@ Your capabilities:
 - View the user's break schedule preferences using get_user_break_settings
 - Provide wellness break tips using get_break_tip
 - Recommend calming music based on mood using recommend_music
+- Search the user's personal knowledge base (uploaded PDFs, documents) using kb_search
 
-IMPORTANT - User ID: Always pass user_id="{user_id}" when calling get_user_activity or get_user_break_settings.
+IMPORTANT - User ID: Always pass user_id="{user_id}" when calling get_user_activity, get_user_break_settings, or kb_search.
 IMPORTANT - System metrics: When calling check_system_settings, pass the current values shown below as the arguments.
 
 EXECUTE vs SHOW mode:
@@ -87,6 +88,8 @@ Rules:
 - When the user asks about their break schedule → call get_user_break_settings
 - CRITICAL MUSIC RULE: When the user asks to play, find, suggest, or search for ANY music → you MUST call the recommend_music tool. NEVER respond with text saying you can't help or asking what mood they want. ALWAYS call the tool. Use `query` param for any specific music type (pooja, lofi, jazz, classical, bhajans, etc). Use `mood` param only for pure feelings (stressed, happy, sad, etc). When auto_play=true, tell them "Playing [type] music for you..."
 - When the user mentions how they're feeling (stressed, anxious, tired, sad, unfocused) → respond empathetically and offer a break tip, but do NOT call recommend_music unless they explicitly ask for music
+- ONLY use kb_search when the user EXPLICITLY mentions their knowledge base, documents, or uploaded files. Examples of explicit mentions: "check my docs", "search my knowledge base", "what does my document say about X", "look in my files", "KB says", "from my notes". Do NOT call kb_search for general wellness questions — only when the user clearly references their uploaded content.
+- If a user's question might be answered by their knowledge base but they didn't mention it, ASK them first: "Would you like me to check your knowledge base for that?" — only call kb_search after they confirm.
 - Keep responses under 100 words unless asked for details
 - Be specific, actionable, and encouraging
 - When auto_apply/auto_play is true: tell the user what you're doing (e.g. "Applying optimal settings...", "Playing focus music...")
@@ -134,8 +137,11 @@ def create_agent_graph(
         get_user_break_settings,
         get_break_tip,
         recommend_music,
+        search_knowledge_base,
     )
     from langchain_core.tools import tool
+
+    user_id = user.get("id", "")
 
     # Create a wrapper that always has the system metrics available
     _brightness = system_metrics.get("brightness") if system_metrics else None
@@ -161,7 +167,12 @@ Set auto_apply=False when the user asks to CHECK, VIEW, or SEE settings. In this
             "auto_apply": auto_apply,
         })
 
-    tools = [check_settings_with_metrics, get_user_activity, get_user_break_settings, get_break_tip, recommend_music]
+    @tool
+    def kb_search(query: str) -> dict:
+        """Search the user's personal knowledge base for relevant information. ONLY call this when the user has EXPLICITLY asked to search their documents, notes, or uploaded files (e.g. 'check my docs', 'what does my KB say', 'search my notes'). Do NOT call proactively for general questions."""
+        return search_knowledge_base.invoke({"user_id": user_id, "query": query})
+
+    tools = [check_settings_with_metrics, get_user_activity, get_user_break_settings, get_break_tip, recommend_music, kb_search]
     llm_with_tools = llm.bind_tools(tools)
 
     tool_node = ToolNode(tools)

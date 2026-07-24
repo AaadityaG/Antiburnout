@@ -234,6 +234,42 @@ def get_break_tip(focus_area: Optional[str] = None, auto_apply: bool = False) ->
 
 
 @tool
+def search_knowledge_base(user_id: str, query: str) -> dict:
+    """Search the user's personal knowledge base for relevant information. ONLY call this when the user has EXPLICITLY asked to search their documents, notes, or uploaded files (e.g. 'check my docs', 'what does my KB say', 'search my notes'). Do NOT call proactively for general questions. Returns all documents in the KB plus matching excerpts from the most relevant ones."""
+    try:
+        from kb.vector_store import search_documents, list_documents
+        all_docs = list_documents(user_id)
+        results = search_documents(user_id, query, k=3)
+
+        doc_list = []
+        for d in all_docs:
+            doc_list.append({
+                "filename": d["filename"],
+                "file_type": d["file_type"],
+                "page_count": d.get("page_count", 1),
+                "total_chunks": d["total_chunks"],
+            })
+
+        formatted = []
+        for r in results:
+            formatted.append({
+                "filename": r["filename"],
+                "content": r["content"][:500],
+                "score": round(r["score"], 3),
+            })
+
+        return {
+            "all_documents": doc_list,
+            "total_documents": len(doc_list),
+            "has_results": len(results) > 0,
+            "results": formatted,
+            "count": len(formatted),
+        }
+    except Exception as e:
+        return {"has_results": False, "error": str(e)}
+
+
+@tool
 def recommend_music(mood: str = "", query: str = "", auto_play: bool = False) -> dict:
     """Recommend music. ALWAYS call this when the user asks to play, find, or suggest music. NEVER just say you can't help — always call this tool.
 
