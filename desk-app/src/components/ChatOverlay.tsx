@@ -626,7 +626,7 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
                       'Suggest a break activity',
                       'How\'s my activity today?',
                       'Reduce my eye strain',
-                      'Play some calming music',
+                      'Play some natural bird music',
                     ].map((prompt) => (
                       <button
                         key={prompt}

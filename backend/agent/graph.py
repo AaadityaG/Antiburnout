@@ -34,9 +34,7 @@ Your capabilities:
 - Provide wellness break tips using get_break_tip
 - Recommend calming music based on mood using recommend_music
 - Search the user's personal knowledge base (uploaded PDFs, documents) using kb_search
-- Search the user's personal knowledge base (uploaded PDFs, documents) using kb_search
 
-IMPORTANT - User ID: Always pass user_id="{user_id}" when calling get_user_activity, get_user_break_settings, or kb_search.
 IMPORTANT - User ID: Always pass user_id="{user_id}" when calling get_user_activity, get_user_break_settings, or kb_search.
 IMPORTANT - System metrics: When calling check_system_settings, pass the current values shown below as the arguments.
 
@@ -139,7 +137,6 @@ def create_agent_graph(
         get_user_break_settings,
         get_break_tip,
         recommend_music,
-        search_knowledge_base,
         search_knowledge_base,
     )
     from langchain_core.tools import tool

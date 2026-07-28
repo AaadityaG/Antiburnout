@@ -10,27 +10,63 @@
         "model_1": {
           "provider": "openrouter",
           "model": "openai/gpt-4o-mini",
-          "api_key": "gAAAAABqU2ot50fONqNuS4wXCfLo28S86VBTFoR_O_CUQJsoagLcejAzSstRiblfcl9qpgxi4Bx_k4NJBZak3wGwnXgtYd2JBT78Zy9bWEXayauo-fNhaG-w6llAXwVivb3mxrbSqPmWotRHvyk63_Ojah4Q-ASLRJ0-t0o0uFiATEl4ZcXDg60="
+          "api_key": "gAAAAABqaM27RF1WL_PLgnnjL3KRL05soMf_DCyQqplem6egH61bkx4CYQYKU5auX2dEscLvWT7H6d5u57UDVEsLx81xNm8wgnN8Ac3Qu4svZzc3M7bcNJ6CSnHyeXpZMmVp3Yiyh7cN0CgvjZoQQ5k0tA8tZSQQUyptmojThKXfqCMj0KeZ-n8="
         },
         "model_2": {
           "provider": "openrouter",
           "model": "anthropic/claude-3-haiku",
-          "api_key": "gAAAAABqU2otxpJLwhxbmBZZK2i_h4-EguChZUpvvpfKpxG3YBZy9NZHHo3wxoYinITrrqqM6EEOhM_h11b_CcR03LkNHLHy8RC-9v48KXM14JjsaoCINEuSjepT7K1araRFTP-p2ytpyfssNcIpSbrK1aQEKhoyDRRnYt3AQsSBYnlZKRaFgaQ="
+          "api_key": "gAAAAABqaM27YxwK991A3AatoqNISQU4WGdkT8hcF4TqrpPNQpyCv3ID5NI9xyZLTSy4StYyrOv8Lsa6Tjzc2EOZs789Rg3GpoaDmc79D92j5I0vbh9Ua-BAtz1yhxMy9pTCZvLXUJwUsWVAfDVKi6f0h3u5nTC9TM2GoIrxni4d_9hd8ZO4v28="
         },
         "model_3": {
           "provider": "openrouter",
           "model": "meta-llama/llama-3.1-70b-instruct",
-          "api_key": "gAAAAABqU2otg8WLx0nXZvv49lW0o9Fb1WjXGcQcDiMQWsMqg6KshuHNgBM4QQU5FHtKGHGSC9XHfNyG3lxsmnLRAbBTsKiSU-tuPSe3A983yQEfRmHOghumD03bc8NWZ1lKg-i_VWhQtUWL5gDZ8oV7SBHCVtxRuN1F-YDsTXzk1cGHEtS_wII="
+          "api_key": "gAAAAABqaM27ciR3vrUmD4AbXz4YS_f4PAYom4YfpAc9yqzPL_bmeD0zy_NM0_UySXUJevUDKWBRMtqhGeHVbFmN4xVUM6oPtucuV_bIdyIu5gbhPmXa-GHLraq1RzG-wVLQo0fyF9lxSP_FClH2Snq76CDmB_s-5C_oRHIn74QQlyP5SUSbqGQ="
         }
       },
       "profile_completed": true,
       "name": "Aditya"
+    },
+    {
+      "id": "1488676e-ee1b-4026-afac-24a39e03de91",
+      "device_id": "test-device-123",
+      "device_name": "Test PC",
+      "created_at": "2026-07-28T15:22:09.748969",
+      "last_login": "2026-07-28T15:22:09.748982"
+    },
+    {
+      "id": "1e05f219-a197-4a1a-8c9f-f76fad9ef4e4",
+      "device_id": "test-device-456",
+      "device_name": "Test PC 2",
+      "created_at": "2026-07-28T15:22:26.711588",
+      "last_login": "2026-07-28T15:22:26.711625"
+    },
+    {
+      "id": "a223091c-636b-447d-bafe-aac08aa968e0",
+      "device_id": "test-kb-789",
+      "device_name": "KB Test",
+      "created_at": "2026-07-28T15:28:43.670406",
+      "last_login": "2026-07-28T15:28:43.670422"
     }
   ],
   "settings": {
     "97d95d5c-daf6-4371-bea7-2ccbf4524d5f": {
       "break_interval": 1800,
       "break_duration": 299,
+      "auto_start": true
+    },
+    "1488676e-ee1b-4026-afac-24a39e03de91": {
+      "break_interval": 30,
+      "break_duration": 20,
+      "auto_start": true
+    },
+    "1e05f219-a197-4a1a-8c9f-f76fad9ef4e4": {
+      "break_interval": 30,
+      "break_duration": 20,
+      "auto_start": true
+    },
+    "a223091c-636b-447d-bafe-aac08aa968e0": {
+      "break_interval": 30,
+      "break_duration": 20,
       "auto_start": true
     }
   },
@@ -811,6 +847,58 @@
       ],
       "created_at": "2026-07-24 09:09:08.923416",
       "updated_at": "2026-07-24 09:09:26.538064"
+    },
+    {
+      "id": "da52902c-3fb1-46af-aed2-d48d5194fd2e",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi]",
+          "response": "Hello! How can I assist you today? If you're looking for tips to prevent burnout or need help with your screen time, I'm here for you!",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-28 15:41:59.347562"
+        }
+      ],
+      "created_at": "2026-07-28 15:41:59.347568",
+      "updated_at": "2026-07-28 15:41:59.347572"
+    },
+    {
+      "id": "9bd0b9d4-5978-4eee-bd7f-adaa68995084",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Play some calming music",
+          "response": "Playing calming music for you \u2014 zen peace for mindfulness. \ud83e\uddd8 Enjoy your break!",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-28 15:42:18.962325"
+        }
+      ],
+      "created_at": "2026-07-28 15:42:18.962328",
+      "updated_at": "2026-07-28 15:42:18.962330"
+    },
+    {
+      "id": "e6dedc65-e8e5-4433-bf6b-94ee75b780a0",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Play some natural bird music",
+          "response": "Playing natural bird music for you. \ud83c\udfb5 Enjoy the soothing sounds!",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-28 15:43:41.514303"
+        },
+        {
+          "message": "play mera hi jalwa",
+          "response": "Playing \"Mera Hi Jalwa\" for you. \ud83c\udfb5 Enjoy the music!",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-07-28 15:45:08.681607"
+        }
+      ],
+      "created_at": "2026-07-28 15:43:41.514327",
+      "updated_at": "2026-07-28 15:45:08.681634"
     }
   ],
   "activity": [
