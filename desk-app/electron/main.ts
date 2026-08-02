@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, Tray, Menu, ipcMain, screen, session } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import AutoLaunch from 'auto-launch'
@@ -443,6 +443,11 @@ ipcMain.handle('set-system-volume', async (event, volume: number) => {
 
 
 app.whenReady().then(() => {
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+    if (permission === 'media') callback(true)
+    else callback(false)
+  })
+
   createWindow()
   createTray()
   

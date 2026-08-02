@@ -13,6 +13,7 @@ import BreakView from './components/BreakView'
 import ChatOverlay from './components/ChatOverlay'
 import MusicOverlay from './components/MusicOverlay'
 import HoverLabel from './components/HoverLabel'
+import GestureController from './components/GestureController'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -428,6 +429,18 @@ function App() {
     setIsPaused(!isPaused)
   }, [isPaused])
 
+  const handleGesturePause = useCallback(() => {
+    if (isPaused) return
+    window.electronAPI?.sendPauseTimer()
+    setIsPaused(true)
+  }, [isPaused])
+
+  const handleGestureResume = useCallback(() => {
+    if (!isPaused) return
+    window.electronAPI?.sendResumeTimer()
+    setIsPaused(false)
+  }, [isPaused])
+
   const resetTimer = useCallback(() => {
     window.electronAPI?.sendResetTimer()
     setIsPaused(false)
@@ -647,6 +660,12 @@ function App() {
 
       <ProfileOverlay isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
       {!isAuthenticated && <LoginModal isOpen={true} onClose={() => {}} />}
+
+      <GestureController
+        onPause={handleGesturePause}
+        onResume={handleGestureResume}
+        onReset={resetTimer}
+      />
     </div>
   )
 }

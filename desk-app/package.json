@@ -19,6 +19,7 @@
     "electron:build:linux": "npm run electron:compile && vite build && cross-env NODE_ENV=production electron-builder --linux"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^1.0.1",
     "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/vite": "^4.3.0",
     "auto-launch": "^5.0.6",

@@ -1320,6 +1320,72 @@
       "total_breaks_taken": 3,
       "total_breaks_skipped": 0,
       "last_updated": "2026-08-02 05:04:54.057787"
+    },
+    {
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "date": "2026-08-02",
+      "sessions": [
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-08-02 06:00:16.986636"
+        },
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-08-02 06:30:37.674707"
+        },
+        {
+          "session_duration": 1785652872,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 06:41:12.817257"
+        },
+        {
+          "session_duration": 1785652884,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 06:41:24.886927"
+        },
+        {
+          "session_duration": 1785653116,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 06:45:17.085994"
+        },
+        {
+          "session_duration": 1785653118,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 06:45:18.795869"
+        },
+        {
+          "session_duration": 1785653122,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 06:45:23.146251"
+        },
+        {
+          "session_duration": 1785653133,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 06:45:33.375109"
+        }
+      ],
+      "total_session_duration": 10713921845,
+      "total_breaks_taken": 8,
+      "total_breaks_skipped": 6,
+      "last_updated": "2026-08-02 06:45:33.375126"
     }
   ]
 }
