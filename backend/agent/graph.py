@@ -5,6 +5,9 @@ from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
 from datetime import datetime
 import asyncio
+import os
+
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 
 def build_system_prompt(user: dict, system_metrics: dict = None) -> str:
@@ -116,19 +119,27 @@ def create_agent_graph(
     model: str,
     user: dict,
     system_metrics: dict = None,
+    base_url: str = None,
 ):
+    base_url = base_url or os.getenv("LLM_BASE_URL") or OPENROUTER_BASE_URL
+    is_openrouter = "openrouter" in base_url
+
+    default_headers = {}
+    if is_openrouter:
+        default_headers = {
+            "HTTP-Referer": "https://antiburnout.ai",
+            "X-Title": "AntiBurnout",
+        }
+
     llm = ChatOpenAI(
         model=model,
         api_key=api_key,
-        base_url="https://openrouter.ai/api/v1",
+        base_url=base_url,
         max_tokens=500,
         temperature=0.7,
         timeout=30,
         max_retries=1,
-        default_headers={
-            "HTTP-Referer": "https://antiburnout.ai",
-            "X-Title": "AntiBurnout",
-        },
+        default_headers=default_headers,
     )
 
     from agent.tools import (

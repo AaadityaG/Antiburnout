@@ -5,7 +5,7 @@
       "device_id": "2772664d8ba4248759dae1bdee97195f",
       "device_name": "Win32",
       "created_at": "2026-07-12T10:11:39.780275",
-      "last_login": "2026-07-23T13:27:24.656868",
+      "last_login": "2026-07-28T16:29:07.777308",
       "ai_providers": {
         "model_1": {
           "provider": "openrouter",
@@ -67,6 +67,11 @@
     "a223091c-636b-447d-bafe-aac08aa968e0": {
       "break_interval": 30,
       "break_duration": 20,
+      "auto_start": true
+    },
+    "eval-user-0001": {
+      "break_interval": 1800,
+      "break_duration": 90,
       "auto_start": true
     }
   },
@@ -899,6 +904,21 @@
       ],
       "created_at": "2026-07-28 15:43:41.514327",
       "updated_at": "2026-07-28 15:45:08.681634"
+    },
+    {
+      "id": "53002c12-50a7-4de2-a170-f610cea7bb82",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! How can I assist you today?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-08-02 05:31:03.901740"
+        }
+      ],
+      "created_at": "2026-08-02 05:31:03.901748",
+      "updated_at": "2026-08-02 05:31:03.901752"
     }
   ],
   "activity": [
@@ -1252,6 +1272,54 @@
       "total_breaks_taken": 12,
       "total_breaks_skipped": 8,
       "last_updated": "2026-07-23 16:27:05.806607"
+    },
+    {
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "date": "2026-07-28",
+      "sessions": [
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-07-28 17:01:06.059635"
+        }
+      ],
+      "total_session_duration": 1800,
+      "total_breaks_taken": 1,
+      "total_breaks_skipped": 0,
+      "last_updated": "2026-07-28 17:01:06.059650"
+    },
+    {
+      "user_id": "eval-user-0001",
+      "date": "2026-08-02",
+      "sessions": [
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-08-02 05:04:54.055212"
+        },
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-08-02 05:04:54.056514"
+        },
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-08-02 05:04:54.057785"
+        }
+      ],
+      "total_session_duration": 5400,
+      "total_breaks_taken": 3,
+      "total_breaks_skipped": 0,
+      "last_updated": "2026-08-02 05:04:54.057787"
     }
   ]
 }

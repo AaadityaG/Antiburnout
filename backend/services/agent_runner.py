@@ -12,6 +12,8 @@ async def run_agent(
     system_metrics: dict,
     message: str,
     conversation_history: list,
+    include_tool_calls: bool = False,
+    base_url: str = None,
 ):
     from agent.graph import create_agent_graph, build_system_prompt
 
@@ -27,6 +29,7 @@ async def run_agent(
         model=model,
         user=user,
         system_metrics=system_metrics if system_metrics else None,
+        base_url=base_url,
     )
 
     logger.info("Agent invocation started", model=model, message_length=len(message), history_turns=len(conversation_history or []))
@@ -40,6 +43,8 @@ async def run_agent(
     recommendations = []
     tools_used = []
     token_usage = {}
+    tool_calls = []
+    tool_results = []
 
     # Extract token usage from the last AIMessage's usage_metadata.
     # LangChain populates this automatically when the LLM returns usage info.
@@ -62,12 +67,20 @@ async def run_agent(
                     tool_name = tc.get("name", "")
                     if tool_name and tool_name not in tools_used:
                         tools_used.append(tool_name)
+                    tool_calls.append({
+                        "name": tc.get("name", ""),
+                        "arguments": tc.get("args", {}) if isinstance(tc.get("args"), dict) else {},
+                    })
         if isinstance(msg, ToolMessage):
             try:
                 import json
                 content = msg.content
                 if isinstance(content, str):
                     content = json.loads(content)
+                tool_results.append({
+                    "name": getattr(msg, "name", ""),
+                    "content": content,
+                })
                 if isinstance(content, dict) and content.get("has_recommendations"):
                     is_auto = content.get("auto_apply", False)
                     for rec in content.get("recommendations", []):
@@ -124,5 +137,8 @@ async def run_agent(
         output_tokens=token_usage.get("output_tokens", 0),
         total_tokens=token_usage.get("total_tokens", 0),
     )
+
+    if include_tool_calls:
+        return ai_response, recommendations, tools_used, token_usage, tool_calls, tool_results
 
     return ai_response, recommendations, tools_used, token_usage
