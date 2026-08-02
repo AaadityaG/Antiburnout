@@ -665,6 +665,7 @@ function App() {
         onPause={handleGesturePause}
         onResume={handleGestureResume}
         onReset={resetTimer}
+        hidden={ambientStage === 'bg' && !cursorVisible}
       />
     </div>
   )

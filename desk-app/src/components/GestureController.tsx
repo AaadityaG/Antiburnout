@@ -22,9 +22,10 @@ interface GestureControllerProps {
   onPause: () => void
   onResume: () => void
   onReset: () => void
+  hidden?: boolean
 }
 
-function GestureController({ onPause, onResume, onReset }: GestureControllerProps) {
+function GestureController({ onPause, onResume, onReset, hidden = false }: GestureControllerProps) {
   const [enabled, setEnabled] = useState(false)
   const [status, setStatus] = useState<Status>('off')
   const [currentGesture, setCurrentGesture] = useState<string | null>(null)
@@ -201,7 +202,7 @@ function GestureController({ onPause, onResume, onReset }: GestureControllerProp
   }[status]
 
   return (
-    <div className="fixed bottom-6 left-6 z-[90] flex flex-col gap-2 items-start">
+    <div className={`fixed bottom-6 left-6 z-[90] flex flex-col gap-2 items-start transition-opacity ${hidden ? 'duration-[8000ms] opacity-0 pointer-events-none' : 'duration-300 opacity-100'}`}>
       <AnimatePresence>
         {lastAction && (
           <motion.div
