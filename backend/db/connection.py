@@ -21,6 +21,18 @@ _mem_activity = []
 
 _DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "local_db.json")
 
+
+def _persist():
+    if USE_MONGO:
+        return
+    import json as _json
+    with open(_DB_FILE, "w", encoding="utf-8") as f:
+        _json.dump(
+            {"users": _mem_users, "settings": _mem_settings, "chat_history": _mem_chat_history, "activity": _mem_activity},
+            f, indent=2, default=str,
+        )
+
+
 print(f"Connecting to MongoDB...")
 print(f"URI: {MONGODB_URI[:20] if MONGODB_URI else 'N/A'}...****")
 print(f"Database: {MONGODB_DB_NAME}")
@@ -77,6 +89,3 @@ except Exception as e:
     _mem_settings = _db_data["settings"]
     _mem_chat_history = _db_data.get("chat_history", [])
     _mem_activity = _db_data.get("activity", [])
-
-    def _persist():
-        _save_db({"users": _mem_users, "settings": _mem_settings, "chat_history": _mem_chat_history, "activity": _mem_activity})

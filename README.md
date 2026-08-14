@@ -32,7 +32,13 @@ venv\Scripts\activate              # Windows
 # source venv/bin/activate         # macOS/Linux
 pip install -r requirements.txt
 copy .env.example .env             # Edit with your values
-python main.py                     # http://localhost:8000
+uvicorn main:app --host 0.0.0.0 --port 8010   # http://localhost:8010
+```
+
+One-liner (PowerShell — activates venv and starts backend on 8010):
+
+```powershell
+cd backend; & .\venv\Scripts\Activate.ps1; uvicorn main:app --host 0.0.0.0 --port 8010
 ```
 
 ### Frontend
@@ -41,7 +47,8 @@ python main.py                     # http://localhost:8000
 cd desk-app
 npm install
 copy .env.example .env
-npm run dev                        # Opens Electron app
+npm run dev                        # Vite dev server (browser)
+npm run electron:dev               # Electron desktop app
 ```
 
 On first launch, configure your **OpenRouter API key** in Profile Settings.
@@ -64,7 +71,7 @@ YTKEY=AIza...                       # optional (for music search)
 ### Frontend (`desk-app/.env`)
 
 ```env
-VITE_API_URL=http://localhost:8000
+VITE_API_URL=http://localhost:8010
 ```
 
 ---
