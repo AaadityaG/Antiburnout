@@ -919,6 +919,21 @@
       ],
       "created_at": "2026-08-02 05:31:03.901748",
       "updated_at": "2026-08-02 05:31:03.901752"
+    },
+    {
+      "id": "9b8f3924-9d84-4d24-9f48-882803cd9d42",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Suggest a break activity",
+          "response": "Here's a break activity for you:\n\n**Activity:** Water Break  \n**Duration:** 30 seconds  \n**Instruction:** Drink a full glass of water. Dehydration causes fatigue and reduced concentration.\n\nWould you like to execute this break activity?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-08-02 15:38:23.926358"
+        }
+      ],
+      "created_at": "2026-08-02 15:38:23.926362",
+      "updated_at": "2026-08-02 15:38:23.926364"
     }
   ],
   "activity": [
@@ -1380,12 +1395,26 @@
           "completed": false,
           "skipped": true,
           "timestamp": "2026-08-02 06:45:33.375109"
+        },
+        {
+          "session_duration": 1785685482,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 15:44:42.814319"
+        },
+        {
+          "session_duration": 1785685489,
+          "target_duration": 1800,
+          "completed": false,
+          "skipped": true,
+          "timestamp": "2026-08-02 15:44:49.906144"
         }
       ],
-      "total_session_duration": 10713921845,
-      "total_breaks_taken": 8,
-      "total_breaks_skipped": 6,
-      "last_updated": "2026-08-02 06:45:33.375126"
+      "total_session_duration": 14285292816,
+      "total_breaks_taken": 10,
+      "total_breaks_skipped": 8,
+      "last_updated": "2026-08-02 15:44:49.906154"
     }
   ]
 }
