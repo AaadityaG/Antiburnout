@@ -14,6 +14,7 @@ async def run_agent(
     conversation_history: list,
     include_tool_calls: bool = False,
     base_url: str = None,
+    use_opencode_free: bool = False,
 ):
     from agent.graph import create_agent_graph, build_system_prompt
 
@@ -30,6 +31,7 @@ async def run_agent(
         user=user,
         system_metrics=system_metrics if system_metrics else None,
         base_url=base_url,
+        use_opencode_free=use_opencode_free,
     )
 
     logger.info("Agent invocation started", model=model, message_length=len(message), history_turns=len(conversation_history or []))

@@ -37,6 +37,7 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [selectedModelKey, setSelectedModelKey] = useState<string>('')
+  const [freeModels, setFreeModels] = useState<string[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -71,6 +72,13 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
       dispatch(fetchKBDocuments(token))
     }
   }, [isOpen, token, dispatch])
+
+  useEffect(() => {
+    if (!isOpen) return
+    axios.get(`${API_URL}/test-inference/models`)
+      .then(res => setFreeModels(res.data?.free_models || []))
+      .catch(() => {})
+  }, [isOpen])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -181,12 +189,23 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
 
   const availableModels = user?.ai_providers || {}
   const modelKeys = Object.keys(availableModels)
+  const allModelOptions = [
+    ...freeModels.map(id => ({ key: `free_${id}`, label: id, isFree: true })),
+    ...modelKeys.map(key => ({ key, label: availableModels[key]?.model, isFree: false })),
+  ]
 
-  if (!selectedModelKey && modelKeys.length > 0) {
-    setSelectedModelKey(modelKeys[0])
+  if (!selectedModelKey) {
+    if (modelKeys.length > 0) {
+      setSelectedModelKey(modelKeys[0])
+    } else if (freeModels.length > 0) {
+      setSelectedModelKey(`free_${freeModels[0]}`)
+    }
   }
 
-  const currentModel = selectedModelKey ? availableModels[selectedModelKey]?.model : 'AI'
+  const selectedIsFree = selectedModelKey?.startsWith('free_')
+  const currentModel = selectedIsFree
+    ? selectedModelKey.slice(5)
+    : selectedModelKey ? availableModels[selectedModelKey]?.model : 'AI'
 
   const handleSend = async (overrideMessage?: string) => {
     const msgToSend = overrideMessage || input.trim()
@@ -580,15 +599,15 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
               </div>
 
               <div className="flex items-center gap-2">
-                {modelKeys.length > 1 && (
+                {allModelOptions.length > 1 && (
                   <select
                     className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-accent cursor-pointer"
                     value={selectedModelKey}
                     onChange={(e) => setSelectedModelKey(e.target.value)}
                   >
-                    {modelKeys.map(key => (
-                      <option key={key} value={key} className="bg-bg-dark">
-                        {availableModels[key]?.model}
+                    {allModelOptions.map(opt => (
+                      <option key={opt.key} value={opt.key} className="bg-bg-dark">
+                        {opt.isFree ? `⚡ ${opt.label} (Free)` : opt.label}
                       </option>
                     ))}
                   </select>

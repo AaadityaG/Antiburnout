@@ -120,27 +120,33 @@ def create_agent_graph(
     user: dict,
     system_metrics: dict = None,
     base_url: str = None,
+    use_opencode_free: bool = False,
 ):
-    base_url = base_url or os.getenv("LLM_BASE_URL") or OPENROUTER_BASE_URL
-    is_openrouter = "openrouter" in base_url
+    if use_opencode_free:
+        from services.opencode_llm import OpenCodeFreeChatModel
 
-    default_headers = {}
-    if is_openrouter:
-        default_headers = {
-            "HTTP-Referer": "https://antiburnout.ai",
-            "X-Title": "AntiBurnout",
-        }
+        llm = OpenCodeFreeChatModel(model=model, temperature=0.7, max_tokens=500)
+    else:
+        base_url = base_url or os.getenv("LLM_BASE_URL") or OPENROUTER_BASE_URL
+        is_openrouter = "openrouter" in base_url
 
-    llm = ChatOpenAI(
-        model=model,
-        api_key=api_key,
-        base_url=base_url,
-        max_tokens=500,
-        temperature=0.7,
-        timeout=30,
-        max_retries=1,
-        default_headers=default_headers,
-    )
+        default_headers = {}
+        if is_openrouter:
+            default_headers = {
+                "HTTP-Referer": "https://antiburnout.ai",
+                "X-Title": "AntiBurnout",
+            }
+
+        llm = ChatOpenAI(
+            model=model,
+            api_key=api_key,
+            base_url=base_url,
+            max_tokens=500,
+            temperature=0.7,
+            timeout=30,
+            max_retries=1,
+            default_headers=default_headers,
+        )
 
     from agent.tools import (
         check_system_settings,

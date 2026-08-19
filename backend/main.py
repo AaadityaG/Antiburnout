@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import device_auth, settings, chat, chat_history, tips, activity, agent, music
+from routers import device_auth, settings, chat, chat_history, tips, activity, agent, music, test_inference
 from kb import kb_router
 
 app = FastAPI(
@@ -28,6 +28,7 @@ app.include_router(activity.router)
 app.include_router(agent.router)
 app.include_router(music.router)
 app.include_router(kb_router)
+app.include_router(test_inference.router)
 
 @app.get("/")
 async def root():

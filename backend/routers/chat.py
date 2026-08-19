@@ -7,6 +7,7 @@ from services.encryption import decrypt_api_key
 from services.agent_runner import run_agent
 from datetime import datetime
 from logger import get_logger
+from routers.test_inference import FREE_MODELS
 
 logger = get_logger("chat")
 
@@ -53,28 +54,46 @@ async def send_message(token: str, request: ChatRequest):
             raise HTTPException(status_code=404, detail="User not found")
 
         ai_providers = user.get("ai_providers", {})
-        if not ai_providers:
-            raise HTTPException(
-                status_code=400,
-                detail="No AI provider configured. Please add one in Profile Settings.",
-            )
 
-        provider_key = request.model_key or list(ai_providers.keys())[0]
-        if provider_key not in ai_providers:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Model '{provider_key}' not found. Please select a valid model.",
-            )
+        use_opencode_free = False
+        base_url = None
 
-        provider_config = ai_providers[provider_key]
-        device_id = user.get("device_id", "")
-        api_key = decrypt_api_key(provider_config["api_key"], device_id)
+        # Free OpenCode inference models — no stored key needed, no auth header
+        if request.model_key and request.model_key.startswith("free_"):
+            model_id = request.model_key[len("free_"):]
+            if model_id not in FREE_MODELS:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Model '{model_id}' is not an allowed free model. Available free models: {FREE_MODELS}",
+                )
+            provider_key = "opencode_free"
+            model = model_id
+            api_key = ""
+            use_opencode_free = True
+        else:
+            if not ai_providers:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No AI provider configured. Please add one in Profile Settings.",
+                )
 
-        print(f"[Chat] Provider: {provider_key}, Model: {provider_config['model']}, Key starts: {api_key[:12]}...")
+            provider_key = request.model_key or list(ai_providers.keys())[0]
+            if provider_key not in ai_providers:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Model '{provider_key}' not found. Please select a valid model.",
+                )
+
+            provider_config = ai_providers[provider_key]
+            device_id = user.get("device_id", "")
+            api_key = decrypt_api_key(provider_config["api_key"], device_id)
+            model = provider_config["model"]
+
+        print(f"[Chat] Provider: {provider_key}, Model: {model}, Key starts: {api_key[:12] if api_key else 'n/a'}...")
         logger.info(
             "Chat request received",
             user_id=user_id,
-            model=provider_config["model"],
+            model=model,
             provider=provider_key,
             has_conversation_history=bool(request.conversation_history),
         )
@@ -89,11 +108,13 @@ async def send_message(token: str, request: ChatRequest):
 
         ai_response, recommendations, tools_used, token_usage = await run_agent(
             api_key=api_key,
-            model=provider_config["model"],
+            model=model,
             user=user,
             system_metrics=system_metrics,
             message=request.message,
             conversation_history=request.conversation_history,
+            base_url=base_url,
+            use_opencode_free=use_opencode_free,
         )
 
         session_id = ""
@@ -104,7 +125,7 @@ async def send_message(token: str, request: ChatRequest):
                     session_id=request.session_id,
                     message=request.message,
                     response=ai_response,
-                    model=provider_config["model"],
+                    model=model,
                     provider_key=provider_key,
                 )
                 session_id = request.session_id
@@ -113,7 +134,7 @@ async def send_message(token: str, request: ChatRequest):
                     user_id=user_id,
                     first_message=request.message,
                     first_response=ai_response,
-                    model=provider_config["model"],
+                    model=model,
                     provider_key=provider_key,
                 )
                 session_id = session_doc["id"]
@@ -180,8 +201,8 @@ async def send_message(token: str, request: ChatRequest):
 
         return ChatResponse(
             response=ai_response,
-            model=provider_config["model"],
-            provider=provider_config.get("provider", "openrouter"),
+            model=model,
+            provider="opencode_free" if use_opencode_free else "openrouter",
             session_id=session_id,
             recommendations=recommendations,
             tools_used=tools_used,
