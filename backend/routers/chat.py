@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional, List
 from auth import verify_token
@@ -198,3 +199,106 @@ def _resolve_model(model_key: str | None, user: dict) -> tuple[str, str]:
         return provider_key, model_id
 
     raise HTTPException(status_code=400, detail=f"Invalid model_key format: '{model_key}'. Use 'provider:model'.")
+
+
+@router.post("/stream")
+async def stream_message(token: str, request: ChatRequest):
+    """SSE streaming endpoint — yields thinking steps live, then final response."""
+    import json
+
+    payload = verify_token(token)
+    user_id = payload.get("sub")
+    user = db.get_user_by_id(user_id)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    provider_key, model = _resolve_model(request.model_key, user)
+
+    api_key = ""
+    ai_providers = user.get("ai_providers", {})
+    if provider_key in ai_providers:
+        device_id = user.get("device_id", "")
+        api_key = decrypt_api_key(ai_providers[provider_key]["api_key"], device_id)
+
+    system_metrics = {}
+    if request.brightness is not None:
+        system_metrics["brightness"] = request.brightness
+    if request.volume is not None:
+        system_metrics["volume"] = request.volume
+    if request.local_hour is not None:
+        system_metrics["local_hour"] = request.local_hour
+
+    async def event_generator():
+        from langchain_core.messages import AIMessage, ToolMessage, HumanMessage, SystemMessage
+        from services.llm_service import get_llm
+        from agent.graph import create_agent_graph, build_system_prompt
+        from config.llm_providers import provider_supports_tools
+
+        system_prompt = build_system_prompt(user, system_metrics if system_metrics else None)
+        tools_supported = provider_supports_tools(provider_key)
+        if not tools_supported:
+            system_prompt += "\n\nIMPORTANT: You cannot execute actions or call tools. You can only provide information, advice, and guidance."
+
+        initial_messages = [{"role": "system", "content": system_prompt}]
+        for msg in (request.conversation_history or [])[-10:]:
+            initial_messages.append({"role": msg.role, "content": msg.content})
+        initial_messages.append({"role": "user", "content": request.message})
+
+        llm = get_llm(provider_key, model, api_key)
+        graph = create_agent_graph(
+            llm=llm,
+            user=user,
+            system_metrics=system_metrics if system_metrics else None,
+            provider_key=provider_key,
+        )
+
+        try:
+            async for chunk in graph.astream(
+                {"messages": initial_messages},
+                config={"recursion_limit": 10},
+                stream_mode="updates",
+            ):
+                for node_name, update in chunk.items():
+                    if node_name == "agent":
+                        for msg in update.get("messages", []):
+                            if isinstance(msg, AIMessage) and msg.tool_calls:
+                                for tc in msg.tool_calls:
+                                    name = tc.get("name", "")
+                                    args = tc.get("args", {})
+                                    args_str = ", ".join(f"{k}={v!r}" for k, v in args.items()) if isinstance(args, dict) else ""
+                                    yield f"data: {json.dumps({'type': 'tool_call', 'tool': name, 'args': args_str})}\n\n"
+                            if isinstance(msg, AIMessage) and msg.content:
+                                content = msg.content
+                                if isinstance(content, list):
+                                    content = " ".join(
+                                        part.get("text", "") if isinstance(part, dict) else str(part)
+                                        for part in content
+                                    )
+                                # This is the final response — send it last
+                                yield f"data: {json.dumps({'type': 'response', 'content': content})}\n\n"
+                    elif node_name == "tools":
+                        for msg in update.get("messages", []):
+                            if isinstance(msg, ToolMessage):
+                                from services.agent_runner import _build_tool_summary
+                                name = getattr(msg, "name", "")
+                                content = msg.content
+                                if isinstance(content, str):
+                                    try:
+                                        content = json.loads(content)
+                                    except Exception:
+                                        pass
+                                summary = _build_tool_summary(name, content)
+                                yield f"data: {json.dumps({'type': 'tool_result', 'tool': name, 'summary': summary})}\n\n"
+
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+        except Exception as e:
+            logger.error("Streaming agent failed", error=str(e))
+            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )

@@ -5,6 +5,52 @@ from logger import get_logger
 logger = get_logger("agent")
 
 
+def _build_tool_summary(tool_name: str, content) -> str:
+    """Build a human-readable summary from a tool result."""
+    if not isinstance(content, dict):
+        return str(content)[:150]
+
+    if tool_name == "get_user_activity":
+        if not content.get("has_data"):
+            return "No activity data recorded yet"
+        return (
+            f"{content.get('total_sessions', 0)} session(s), "
+            f"{content.get('total_focus_minutes', 0)} min focus, "
+            f"{content.get('total_breaks_taken', 0)} break(s) taken, "
+            f"{content.get('break_compliance', 0)}% compliance"
+        )
+
+    if tool_name in ("check_system_settings", "check_settings_with_metrics"):
+        recs = content.get("recommendations", [])
+        if not recs:
+            return "All settings are optimal"
+        types = [r.get("type", "") for r in recs]
+        return f"Found {len(recs)} recommendation(s): {', '.join(types)}"
+
+    if tool_name == "get_user_break_settings":
+        if content.get("has_settings"):
+            s = content.get("settings", {})
+            return f"Breaks every {s.get('break_interval', '?')} min, {s.get('break_duration', '?')}s duration"
+        return "No break settings configured"
+
+    if tool_name == "get_break_tip":
+        tip = content.get("tip", "")
+        return tip[:120] if tip else "Generated a break tip"
+
+    if tool_name == "recommend_music":
+        label = content.get("label", content.get("mood", "music"))
+        return f"Found {label} music"
+
+    if tool_name == "kb_search":
+        results = content.get("results", [])
+        return f"Found {len(results)} result(s)" if results else "No matching documents"
+
+    # Fallback: just show success/failure
+    if content.get("success") is False or content.get("error"):
+        return f"Error: {content.get('error', 'unknown')[:100]}"
+    return "Done"
+
+
 async def run_agent(
     provider_key: str,
     model: str,
@@ -146,8 +192,7 @@ async def run_agent(
             for tc in msg.tool_calls:
                 name = tc.get("name", "")
                 args = tc.get("args", {})
-                args_str = ", ".join(f"{k}={v!r}" for k, v in args.items()) if isinstance(args, dict) else ""
-                thinking_steps.append({"type": "tool_call", "tool": name, "args": args_str})
+                thinking_steps.append({"type": "tool_call", "tool": name, "args": ""})
         if isinstance(msg, ToolMessage):
             name = getattr(msg, "name", "")
             content = msg.content
@@ -157,11 +202,7 @@ async def run_agent(
                     content = json.loads(content)
                 except Exception:
                     pass
-            summary = ""
-            if isinstance(content, dict):
-                summary = content.get("message", content.get("summary", str(content)[:200]))
-            else:
-                summary = str(content)[:200]
+            summary = _build_tool_summary(name, content)
             thinking_steps.append({"type": "tool_result", "tool": name, "summary": summary})
 
     logger.info(

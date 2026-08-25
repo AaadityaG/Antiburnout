@@ -17,13 +17,24 @@ interface ChatOverlayProps {
   onPlayMusic?: (mood: string, query?: string) => void
 }
 
+const TOOL_ICONS: Record<string, string> = {
+  check_system_settings: '⚙️',
+  check_settings_with_metrics: '⚙️',
+  get_user_activity: '📊',
+  get_user_break_settings: '⏰',
+  get_break_tip: '💡',
+  recommend_music: '🎵',
+  kb_search: '📚',
+}
+
 const TOOL_LABELS: Record<string, string> = {
-  check_system_settings: 'Checking system settings',
-  get_user_activity: 'Fetching activity data',
-  get_user_break_settings: 'Fetching break schedule',
-  get_break_tip: 'Generating break tip',
+  check_system_settings: 'Checked system settings',
+  check_settings_with_metrics: 'Checked system settings',
+  get_user_activity: 'Fetched activity data',
+  get_user_break_settings: 'Fetched break schedule',
+  get_break_tip: 'Generated break tip',
   recommend_music: 'Finding music',
-  kb_search: 'Searching knowledge base',
+  kb_search: 'Searched knowledge base',
 }
 
 function ThinkingSteps({ steps }: { steps: { type: string; tool?: string; args?: string; summary?: string }[] }) {
@@ -32,15 +43,15 @@ function ThinkingSteps({ steps }: { steps: { type: string; tool?: string; args?:
   if (steps.length === 0) return null
 
   return (
-    <div className="mt-2 pt-2 border-t border-white/[0.06]">
+    <div className="mt-3 pt-3 border-t border-white/[0.06]">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 text-[11px] text-white/30 hover:text-white/50 transition-colors cursor-pointer"
+        className="flex items-center gap-2 text-[11px] text-white/25 hover:text-white/45 transition-colors cursor-pointer select-none"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${expanded ? 'rotate-90' : ''}`}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}>
           <polyline points="9 18 15 12 9 6" />
         </svg>
-        <span>Reasoning ({steps.length} step{steps.length !== 1 ? 's' : ''})</span>
+        <span>Reasoning · {steps.length} step{steps.length !== 1 ? 's' : ''}</span>
       </button>
       <AnimatePresence>
         {expanded && (
@@ -48,32 +59,26 @@ function ThinkingSteps({ steps }: { steps: { type: string; tool?: string; args?:
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             className="overflow-hidden"
           >
-            <div className="mt-2 space-y-1.5">
-              {steps.map((step, i) => (
-                <div key={i} className="flex items-start gap-2 text-[11px]">
-                  {step.type === 'tool_call' ? (
-                    <>
-                      <span className="text-accent/60 shrink-0 mt-0.5">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                      </span>
-                      <span className="text-white/40">
-                        {TOOL_LABELS[step.tool || ''] || step.tool}
-                        {step.args && <span className="text-white/20">({step.args})</span>}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-green-400/60 shrink-0 mt-0.5">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                      </span>
-                      <span className="text-white/30">{step.summary}</span>
-                    </>
-                  )}
-                </div>
-              ))}
+            <div className="mt-2.5 space-y-0">
+              {steps.map((step, i) => {
+                const icon = TOOL_ICONS[step.tool || ''] || '🔧'
+                const label = TOOL_LABELS[step.tool || ''] || step.tool
+                return (
+                  <div key={i} className="flex items-start gap-2.5 py-1">
+                    <span className="text-[13px] shrink-0 mt-px leading-none">{icon}</span>
+                    <div className="min-w-0 flex-1">
+                      {step.type === 'tool_call' ? (
+                        <span className="text-[11px] text-white/30 leading-relaxed">{label}...</span>
+                      ) : (
+                        <span className="text-[11px] text-white/45 leading-relaxed">{step.summary || 'Done'}</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </motion.div>
         )}
@@ -274,6 +279,15 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
     setInput('')
     setIsTyping(true)
 
+    // Add placeholder assistant message that we'll update live
+    const msgIndex = messages.length + 1 // +1 for the user message we just added
+    setMessages(prev => [...prev, {
+      role: 'assistant',
+      content: '',
+      thinking_steps: [],
+      tools_used: [],
+    }])
+
     try {
       const conversationHistory = messages
         .filter(msg => !msg.content.startsWith('👋'))
@@ -283,62 +297,98 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
           content: msg.content
         }))
 
-      // Get real system metrics from Electron
       let brightness: number | null = null
       let volume: number | null = null
       if (window.electronAPI) {
-        try {
-          brightness = await window.electronAPI.getSystemBrightness()
-        } catch (e) {
-          console.log('Brightness not available:', e)
-        }
-        
-        try {
-          volume = await window.electronAPI.getSystemVolume()
-        } catch (e) {
-          console.log('Volume not available:', e)
-        }
+        try { brightness = await window.electronAPI.getSystemBrightness() } catch {}
+        try { volume = await window.electronAPI.getSystemVolume() } catch {}
       }
 
-      console.log('Sending chat with system metrics:', { brightness, volume })
-
-      const response = await axios.post(`${API_URL}/chat/send`, {
-        message: userMessage,
-        conversation_history: conversationHistory,
-        model_key: selectedModelKey,
-        session_id: activeSessionId || undefined,
-        brightness: brightness,
-        volume: volume,
-        local_hour: new Date().getHours()
-      }, {
-        params: { token }
+      const res = await fetch(`${API_URL}/chat/stream?token=${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          conversation_history: conversationHistory,
+          model_key: selectedModelKey,
+          session_id: activeSessionId || undefined,
+          brightness,
+          volume,
+          local_hour: new Date().getHours(),
+        }),
       })
 
-      console.log('Chat response received:', response.data)
-      console.log('Recommendations:', response.data.recommendations)
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let thinking_steps: any[] = []
+      let tools_used: string[] = []
+      let responseText = ''
 
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: response.data.response,
-        recommendations: response.data.recommendations || [],
-        tools_used: response.data.tools_used || [],
-        token_usage: response.data.token_usage || undefined,
-        model_config_info: response.data.model_config_info || undefined,
-        model: response.data.model || undefined,
-        thinking_steps: response.data.thinking_steps || [],
-      }])
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
 
-      if (response.data.session_id && !activeSessionId) {
-        setActiveSessionId(response.data.session_id)
-        dispatch(fetchSessions(token))
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue
+          try {
+            const event = JSON.parse(line.slice(6))
+
+            if (event.type === 'tool_call') {
+              thinking_steps = [...thinking_steps, { type: 'tool_call', tool: event.tool, args: event.args }]
+              if (!tools_used.includes(event.tool)) tools_used = [...tools_used, event.tool]
+              setMessages(prev => {
+                const updated = [...prev]
+                updated[msgIndex] = { ...updated[msgIndex], thinking_steps: [...thinking_steps], tools_used: [...tools_used] }
+                return updated
+              })
+            } else if (event.type === 'tool_result') {
+              thinking_steps = [...thinking_steps, { type: 'tool_result', tool: event.tool, summary: event.summary }]
+              setMessages(prev => {
+                const updated = [...prev]
+                updated[msgIndex] = { ...updated[msgIndex], thinking_steps: [...thinking_steps] }
+                return updated
+              })
+            } else if (event.type === 'response') {
+              responseText = event.content
+              setMessages(prev => {
+                const updated = [...prev]
+                updated[msgIndex] = { ...updated[msgIndex], content: responseText }
+                return updated
+              })
+            } else if (event.type === 'error') {
+              responseText = `⚠️ ${event.content}`
+              setMessages(prev => {
+                const updated = [...prev]
+                updated[msgIndex] = { ...updated[msgIndex], content: responseText }
+                return updated
+              })
+            }
+          } catch {}
+        }
       }
+
+      // Final update — if no response text, use fallback
+      if (!responseText) {
+        responseText = "I'm here to help you stay well! What's on your mind?"
+        setMessages(prev => {
+          const updated = [...prev]
+          updated[msgIndex] = { ...updated[msgIndex], content: responseText }
+          return updated
+        })
+      }
+
     } catch (error: any) {
       console.error('Chat error:', error)
-      const errorMessage = error.response?.data?.detail || 'Sorry, I couldn\'t process that. Please try again.'
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `⚠️ ${errorMessage}`
-      }])
+      setMessages(prev => {
+        const updated = [...prev]
+        updated[msgIndex] = { ...updated[msgIndex], content: `⚠️ ${error.message || 'Failed to connect'}` }
+        return updated
+      })
     } finally {
       setIsTyping(false)
     }
@@ -729,28 +779,23 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div className={`max-w-[80%] px-6 py-4 rounded-2xl text-base leading-relaxed text-left whitespace-pre-wrap ${msg.role === 'user' ? 'bg-accent/15 border border-accent/25 text-white rounded-br-md' : 'bg-white/[0.04] border border-white/[0.06] text-green-200/80 rounded-bl-md'}`}>
-                        {msg.content}
+                        {msg.content || (msg.role === 'assistant' && (!msg.thinking_steps || msg.thinking_steps.length === 0)) ? (
+                          msg.content
+                        ) : null}
+                        {msg.role === 'assistant' && !msg.content && (!msg.thinking_steps || msg.thinking_steps.length === 0) && (
+                          <span className="flex items-center gap-2 text-white/30">
+                            <span className="flex gap-1 items-end h-4">
+                              <span className="w-1 bg-accent/50 rounded-full animate-pulse" style={{ height: '40%' }} />
+                              <span className="w-1 bg-accent/50 rounded-full animate-pulse" style={{ height: '80%', animationDelay: '0.15s' }} />
+                              <span className="w-1 bg-accent/50 rounded-full animate-pulse" style={{ height: '50%', animationDelay: '0.3s' }} />
+                            </span>
+                            Thinking...
+                          </span>
+                        )}
 
                         {/* Thinking steps */}
                         {msg.thinking_steps && msg.thinking_steps.length > 0 && msg.role === 'assistant' && (
                           <ThinkingSteps steps={msg.thinking_steps} />
-                        )}
-
-                        {/* Tool usage indicators */}
-                        {msg.tools_used && msg.tools_used.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-white/[0.06]">
-                            {msg.tools_used.map((tool: string) => (
-                              <span key={tool} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-[11px] text-accent/80 font-medium">
-                                {tool === 'check_system_settings' && '⚙️ Settings checked'}
-                                {tool === 'get_user_activity' && '📊 Activity fetched'}
-                                {tool === 'get_user_break_settings' && '⏰ Schedule fetched'}
-                                {tool === 'get_break_tip' && '💡 Tip generated'}
-                                {tool === 'recommend_music' && '🎵 Music recommended'}
-                                {tool === 'kb_search' && '📚 Knowledge base searched'}
-                                {!['check_system_settings', 'get_user_activity', 'get_user_break_settings', 'get_break_tip', 'recommend_music', 'kb_search'].includes(tool) && `🔧 ${tool}`}
-                              </span>
-                            ))}
-                          </div>
                         )}
 
                         {/* Token usage and model info */}
