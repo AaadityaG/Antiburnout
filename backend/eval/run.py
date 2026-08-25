@@ -7,7 +7,7 @@ Usage (from backend/):
     python -m eval.run chunking            # chunking correctness (no LLM)
     python -m eval.run all --force         # everything
 
-Required env: LANGSMITH_API_KEY, OPENROUTER_API_KEY (see .env.example).
+Required env: LANGSMITH_API_KEY, and a provider API key (see .env.example).
 """
 
 import argparse

@@ -71,18 +71,9 @@ export const authSlice = createSlice({
         // Update localStorage
         localStorage.setItem('user', JSON.stringify(state.user))
       }
-    },
-    updateAIProviders: (state, action: PayloadAction<{ ai_providers: any; profile_completed: boolean }>) => {
-      if (state.user) {
-        state.user.ai_providers = action.payload.ai_providers
-        state.user.profile_completed = action.payload.profile_completed
-        
-        // Update localStorage
-        localStorage.setItem('user', JSON.stringify(state.user))
-      }
     }
   }
 })
 
-export const { login, logout, updateProfile, updateAIProviders } = authSlice.actions
+export const { login, logout, updateProfile } = authSlice.actions
 export default authSlice.reducer

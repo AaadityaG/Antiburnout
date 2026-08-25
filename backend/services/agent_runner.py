@@ -6,32 +6,37 @@ logger = get_logger("agent")
 
 
 async def run_agent(
-    api_key: str,
+    provider_key: str,
     model: str,
+    api_key: str,
     user: dict,
     system_metrics: dict,
     message: str,
     conversation_history: list,
     include_tool_calls: bool = False,
-    base_url: str = None,
-    use_opencode_free: bool = False,
 ):
     from agent.graph import create_agent_graph, build_system_prompt
+    from services.llm_service import get_llm
+    from config.llm_providers import provider_supports_tools
 
     system_prompt = build_system_prompt(user, system_metrics if system_metrics else None)
+
+    tools_supported = provider_supports_tools(provider_key)
+    if not tools_supported:
+        system_prompt += "\n\nIMPORTANT: You cannot execute actions or call tools. You can only provide information, advice, and guidance. Do not claim to perform actions you cannot actually do. When a user asks you to check settings, recommend music, or search documents, explain what they should do or provide the information directly."
 
     initial_messages = [{"role": "system", "content": system_prompt}]
     for msg in (conversation_history or [])[-10:]:
         initial_messages.append({"role": msg.role, "content": msg.content})
     initial_messages.append({"role": "user", "content": message})
 
+    llm = get_llm(provider_key, model, api_key)
+
     graph = create_agent_graph(
-        api_key=api_key,
-        model=model,
+        llm=llm,
         user=user,
         system_metrics=system_metrics if system_metrics else None,
-        base_url=base_url,
-        use_opencode_free=use_opencode_free,
+        provider_key=provider_key,
     )
 
     logger.info("Agent invocation started", model=model, message_length=len(message), history_turns=len(conversation_history or []))
@@ -48,9 +53,6 @@ async def run_agent(
     tool_calls = []
     tool_results = []
 
-    # Extract token usage from the last AIMessage's usage_metadata.
-    # LangChain populates this automatically when the LLM returns usage info.
-    # Structure: {"input_tokens": int, "output_tokens": int, "total_tokens": int}
     for msg in reversed(final_state["messages"]):
         if isinstance(msg, AIMessage) and hasattr(msg, "usage_metadata") and msg.usage_metadata:
             token_usage = {
@@ -63,7 +65,14 @@ async def run_agent(
     for msg in final_state["messages"]:
         if isinstance(msg, AIMessage):
             if msg.content:
-                ai_response = msg.content
+                # Gemini native SDK returns content as list of parts
+                content = msg.content
+                if isinstance(content, list):
+                    content = " ".join(
+                        part.get("text", "") if isinstance(part, dict) else str(part)
+                        for part in content
+                    )
+                ai_response = content
             if msg.tool_calls:
                 for tc in msg.tool_calls:
                     tool_name = tc.get("name", "")

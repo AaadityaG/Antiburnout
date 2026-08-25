@@ -1,60 +1,38 @@
-import httpx
 from fastapi import APIRouter, HTTPException
+from services.llm_service import get_llm
+from config.llm_providers import list_providers_for_frontend
+from langchain_core.messages import HumanMessage
 
 router = APIRouter(prefix="/test-inference", tags=["Test Inference"])
 
-INFERENCE_URL = "https://opencode.ai/inference/openai/v1/chat/completions"
-
-FREE_MODELS = [
-    "big-pickle",
-    "deepseek-v4-flash-free",
-    "mimo-v2.5-free",
-    "hy3-free",
-    "nemotron-3-ultra-free",
-    "nemotron-3.5-lightning-free",
-    "laguna-s-2.1-free",
-]
-
-@router.get("/models")
-async def list_free_models():
-    """List free models available on the OpenCode inference API."""
-    return {"free_models": FREE_MODELS}
 
 @router.get("/opencode")
-async def test_opencode_inference(
+async def test_inference(
     message: str = "HI",
-    model: str = "big-pickle",
+    provider: str = "",
+    model: str = "",
 ):
-    """Test endpoint that calls the OpenCode inference API and returns the response.
+    """Test endpoint that calls the first available LLM provider."""
+    available = list_providers_for_frontend()
+    if not available:
+        raise HTTPException(status_code=400, detail="No LLM providers configured in backend/.env.")
 
-    Free models are callable without an auth header. Only the free models listed
-    in FREE_MODELS are accepted.
-    """
-    if model not in FREE_MODELS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Model '{model}' is not allowed. Available free models: {FREE_MODELS}",
-        )
+    # Use specified or first available
+    provider_key = provider or available[0]["key"]
+    provider_info = next((p for p in available if p["key"] == provider_key), None)
+    if not provider_info:
+        raise HTTPException(status_code=400, detail=f"Provider '{provider_key}' not available (no API key in .env).")
+
+    model_id = model or provider_info["default_model"]
+
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(
-                INFERENCE_URL,
-                headers={"Content-Type": "application/json"},
-                json={
-                    "model": model,
-                    "messages": [
-                        {"role": "user", "content": message}
-                    ],
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-            return {
-                "status": "ok",
-                "model": model,
-                "content": data["choices"][0]["message"]["content"],
-            }
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=502, detail=f"OpenCode inference failed: {e}")
-    except (httpx.HTTPError, KeyError, IndexError) as e:
-        raise HTTPException(status_code=500, detail=f"Error calling OpenCode inference: {str(e)}")
+        llm = get_llm(provider_key, model_id)
+        response = await llm.ainvoke([HumanMessage(content=message)])
+        return {
+            "status": "ok",
+            "provider": provider_key,
+            "model": model_id,
+            "content": response.content,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"LLM inference failed: {str(e)}")

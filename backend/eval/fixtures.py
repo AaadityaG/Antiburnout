@@ -14,9 +14,6 @@ from datetime import datetime, timedelta
 EVAL_USER_ID = "eval-user-0001"
 EVAL_KB_USER_ID = "eval-kb-user"
 
-DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o-mini"
-DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
-
 
 def get_eval_user() -> dict:
     """Return the fixture user the agent runs as (no DB round-trip needed)."""
@@ -34,37 +31,35 @@ def get_eval_user() -> dict:
 def get_llm_config() -> dict:
     """Resolve the LLM config for real-LLM evaluation.
 
-    Accepts a key under OPENROUTER_API_KEY, EVAL_OPENROUTER_API_KEY, or
-    OPENAI_API_KEY and detects the provider from the key prefix, so the same
-    harness works on any machine with either provider. Both use the
-    OpenAI-compatible chat completions API, so the agent's ChatOpenAI binding
-    works unchanged.
+    Uses the central provider config. The EVAL_PROVIDER env var selects which
+    provider to use (defaults to "openrouter"). The EVAL_MODEL env var
+    overrides the model.
     """
+    from config.llm_providers import get_provider
+
+    provider_key = os.getenv("EVAL_PROVIDER", "openrouter")
+    provider = get_provider(provider_key)
+
     model_override = os.getenv("EVAL_MODEL")
+    model = model_override or provider["default_model"]
+
+    # Try env var keys in order: <PROVIDER>_API_KEY, EVAL_<PROVIDER>_API_KEY, OPENAI_API_KEY
     key = (
-        os.getenv("OPENROUTER_API_KEY")
-        or os.getenv("EVAL_OPENROUTER_API_KEY")
+        os.getenv(f"{provider_key.upper()}_API_KEY")
+        or os.getenv(f"EVAL_{provider_key.upper()}_API_KEY")
         or os.getenv("OPENAI_API_KEY")
     )
     if not key:
         raise RuntimeError(
-            "No LLM key found for real-LLM evaluation. Set OPENROUTER_API_KEY or "
-            "OPENAI_API_KEY in backend/.env (see .env.example)."
+            f"No LLM key found for provider '{provider_key}'. "
+            f"Set {provider_key.upper()}_API_KEY in backend/.env."
         )
 
-    base_url_override = os.getenv("LLM_BASE_URL")
-    if key.startswith("sk-or-v1-") or key.startswith("sk-or-"):
-        return {
-            "provider": "openrouter",
-            "api_key": key,
-            "base_url": base_url_override or "https://openrouter.ai/api/v1",
-            "model": model_override or DEFAULT_OPENROUTER_MODEL,
-        }
     return {
-        "provider": "openai",
+        "provider": provider_key,
         "api_key": key,
-        "base_url": base_url_override or "https://api.openai.com/v1",
-        "model": model_override or DEFAULT_OPENAI_MODEL,
+        "base_url": os.getenv("LLM_BASE_URL") or provider["base_url"],
+        "model": model,
     }
 
 

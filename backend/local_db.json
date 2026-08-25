@@ -948,6 +948,282 @@
       ],
       "created_at": "2026-08-25 07:04:07.147977",
       "updated_at": "2026-08-25 07:04:07.147979"
+    },
+    {
+      "id": "8dad91ad-4b39-4607-b877-ba55ec61dcc7",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! I'm your AntiBurnout Assistant. I'm here to help you prevent digital burnout and maintain your wellness during long screen sessions. \n\nHow are you feeling today? I can help you check your system settings, suggest a quick wellness break, or play some calming music to help you focus or relax. What can I do for you?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 12:42:50.247376"
+        }
+      ],
+      "created_at": "2026-08-25 12:42:50.247400",
+      "updated_at": "2026-08-25 12:42:50.247411"
+    },
+    {
+      "id": "0ddb7e26-08c8-47ee-8fe5-370d5648b1c7",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hi there! I'm your AntiBurnout Assistant. Congrats on your 44-day wellness journey! \ud83c\udf1f\n\nI noticed your screen brightness and volume are currently at 100%, which can cause serious eye strain and fatigue during long sessions. \n\nWould you like me to optimize your system settings, suggest a quick wellness break, or play some calming music? Let me know how I can help you stay refreshed!",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 12:49:22.884868"
+        }
+      ],
+      "created_at": "2026-08-25 12:49:22.884889",
+      "updated_at": "2026-08-25 12:49:22.884900"
+    },
+    {
+      "id": "a89abc4f-917b-4f7e-9880-987d4be6f7e0",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "I'm here to help you stay well! What's on your mind?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 12:51:00.246985"
+        }
+      ],
+      "created_at": "2026-08-25 12:51:00.247031",
+      "updated_at": "2026-08-25 12:51:00.247046"
+    },
+    {
+      "id": "891815ae-3cb9-4761-ad3f-3b5749cb1827",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "I'm here to help you stay well! What's on your mind?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 12:56:59.249169"
+        }
+      ],
+      "created_at": "2026-08-25 12:56:59.249191",
+      "updated_at": "2026-08-25 12:56:59.249202"
+    },
+    {
+      "id": "196f64b1-1ef5-4659-85bc-efe7abba2f34",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "I'm here to help you stay well! What's on your mind?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 12:57:48.516269"
+        },
+        {
+          "message": "are my setting properl",
+          "response": "I'm here to help you stay well! What's on your mind?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 12:58:02.925485"
+        }
+      ],
+      "created_at": "2026-08-25 12:57:48.516273",
+      "updated_at": "2026-08-25 12:58:02.925526"
+    },
+    {
+      "id": "7e3cb596-80f9-4371-ad63-cbe6885ccc83",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "I'm here to help you stay well! What's on your mind?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:02:17.538055"
+        },
+        {
+          "message": "hi",
+          "response": "I'm here to help you stay well! What's on your mind?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:03:13.511332"
+        }
+      ],
+      "created_at": "2026-08-25 13:02:17.538079",
+      "updated_at": "2026-08-25 13:03:13.511340"
+    },
+    {
+      "id": "ff07fd1c-22b2-494d-8ea9-f6cd80d6e419",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! I'm your AntiBurnout Assistant, here to help you keep your screen time healthy and stress-free. \n\nWe can check your device settings to ease eye strain, look at your break schedule, find some calming music, or get a quick wellness tip. \n\nHow are you feeling today, and how can I help you stay refreshed?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:08:37.374742"
+        }
+      ],
+      "created_at": "2026-08-25 13:08:37.374747",
+      "updated_at": "2026-08-25 13:08:37.374749"
+    },
+    {
+      "id": "8748b74a-679f-42b4-87ce-1a31f124a2e4",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Play some natural bird music",
+          "response": "I am putting on some natural bird music for you now to help you relax and connect with nature. Enjoy the soothing sounds!",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:08:49.162941"
+        }
+      ],
+      "created_at": "2026-08-25 13:08:49.162968",
+      "updated_at": "2026-08-25 13:08:49.162981"
+    },
+    {
+      "id": "8e2a9f27-71be-4364-84cc-6cef4df7b6cc",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! I'm your AntiBurnout Assistant, here to help you keep your",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:16:56.505586"
+        }
+      ],
+      "created_at": "2026-08-25 13:16:56.505612",
+      "updated_at": "2026-08-25 13:16:56.505625"
+    },
+    {
+      "id": "5f02d525-58e4-4e53-8879-f83719b4dd3d",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "Based on your current device readings, your settings are set to maximum levels, which can significantly contribute to",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:17:07.155702"
+        },
+        {
+          "message": "hi]\\",
+          "response": "Hello! Sorry about that brief interruption. \n\nI noticed earlier we were looking at your settings. Currently, both your **screen brightness and volume are at 100%**. Running these at maximum levels is a major contributor to digital eye strain, headaches, and overall mental fatigue. \n\nI highly recommend manually lowering your screen brightness to around 50% (or enabling night mode) and turning your volume down to a comfortable 30-40%. \n\nHow are you feeling otherwise today? I can share a quick, refreshing break tip if you'd like!",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:19:10.799982"
+        },
+        {
+          "message": "can you do that",
+          "response": "I cannot directly access or change your device settings for you. However, you can easily adjust them yourself to help prevent burnout! \n\nHere is what you can do right now:\n1. **Lower your brightness** to around 50% in your device's quick settings menu.\n2. **Turn on Night Light / Night Shift** to reduce blue light.\n3. **Reduce your volume** to about 30% to give your ears a rest.\n\nGive those a try and see if your eyes and head feel a bit more relaxed! Would you like a quick physical stretch tip while you adjust?",
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:19:35.171056"
+        }
+      ],
+      "created_at": "2026-08-25 13:17:07.155729",
+      "updated_at": "2026-08-25 13:19:35.171089"
+    },
+    {
+      "id": "e279c931-a2a8-4a07-9b12-9c5b93b20f98",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": [
+            {
+              "type": "text",
+              "text": "Your current settings are quite high for this time of evening (7:00 PM), which can accelerate digital burnout and eye strain. Here is what I recommend:\n\n*   **Brightness:** Reduce from **100% to 65%** to ease eye strain in evening light.\n*   **Volume:** Reduce from **100% to 60%** to protect your hearing (per WHO guidelines).\n\nWould you like me to optimize these settings for you? You can click **Execute** below to apply these changes instantly, or **Reject** to keep them as they are.",
+              "extras": {
+                "signature": "Eu8ECuwEARFNMg/7Xs8AXQFdG5D9f/f5mafyFa61lbTkl71ldlp+NDtxWp8IuRSVYGpVlOaHz6k9tVlLJuSS8R9JHIJtewLFEGTui14il82W5YdPpNv5EODKshpCW4x1zDfvTnTLMY1RLlur6Bd+wPfDFwihkd/FyBnjjW8v8QG8NLPy95+Hg+BY3VC0LJ40WkO91nZhRojE/sMA2i7A91y2Jx+54qg5vy5wJNFzPEX8KLwnTdOx+MKlbTnNUPIowshN4S7arKqvXdOvX1xVFV+El4iAosBxJ6lCfe3mUD5l+E9erzjrsN3TgvFlVXAKZptD+9sn/te11BHeWvyLN4XoKr8rIu2pkHs6VQH9vptvbDbhwMSYBD96EslT2rCZig+TCKuV99YF9Qhr8xrjTB2oxwYkhqYjJcTbAtz+QvTq1XM024tqra0bhUwO3LXkxwzEBwU6Upkmb4wsAwX3SsU2r7P3EJ2lMGn10ESwX5NPS/BemfKrXojxYRG8y3jW43Sg7mwwDsL5ibhd3M7PLYq2jIoY+aeAQN8OGG58vNzgLPXOeaaj7DhCrk7Nlef3lM6vXOGFWoShOxNf1DgoTtBGfLOx0OvEf9+W1jGBLVpnhmPJkzyDBiLNKzjUbBb9YuhTRg0sG8NsV2e9vEoEkymQ/9JHMSfRVTs2JLLDT8gXxrEFq0RredZQiJ2SvQz3ehkWF7GBxt9SOdNnBI8jGJ4t2WKa8T87rh+MaGpIr7/4j8W/VzqY1i/FYD7Yb7KAGtFP6R5/p+YRsYJjerxfz8KU3n3hOi3vqn4gJVP9J91qEyevjAqjr3a259kZ/3jROaE="
+              }
+            }
+          ],
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:38:44.843811"
+        }
+      ],
+      "created_at": "2026-08-25 13:38:44.843835",
+      "updated_at": "2026-08-25 13:38:44.843846"
+    },
+    {
+      "id": "59ea9de4-e838-428a-b84c-6b24483dc284",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": [
+            {
+              "type": "text",
+              "text": "Hello! I'm your AntiBurnout Assistant. \ud83c\udf3f \n\nI'm here to help you stay energized and prevent digital burnout during your screen sessions. Today, I can:\n*   **Check and optimize** your screen brightness and volume.\n*   **Suggest a quick wellness break** or stretch.\n*   **Play calming music** tailored to your mood.\n*   **Review your break schedule** and daily activity.\n\nHow are you feeling right now, or what can I help you with?",
+              "extras": {
+                "signature": "EtMICtAIARFNMg/HqXodULj/f14kivF4iqKPhk6B6D1Axxqnnqt7G2i82CzM0p+hGwK56igqAG34RB1JlLtlVD0OsH5tIDW/oUmSij2JQ/CpsZtgBSxazE3B9IKTljAUo5DDR3f1sjU2Zvof2w51odaks0Bkz+5Pxgkz4n1HodCz4oWFsr+WnVLaKqhSsXzNKELE3SDCkAkJQ++4/k6iYA7yK6WfZF2dpaTUWvxfRqIRkVQefsY+u7+AhxeWkoQBRO0NmaRVwlzr2w4NY0d9v3fgRzCGo1Z81ukNM9CUaR3CszirF5FMdzqJXPTKJFIZBrHN9F+CgwyLWwR5nnwA04Vfmfq2s5U3liXi3vmlDVeJjUgLWaLiD/i/8MfdaV6t+gDjY7S4R+XZ+Og93V4cBbapzXA3yT7Dmsn4he5e9k5keUbg4R6yI2H/9mMkDbzhbVejamqHlCtbGwbxoVLjNVIE7FRxzOHrHYXm+fQxC7ObDVJXzKa8E6PECrEvrQp3jks+keEiuZ+F/HjA4CmqsQ1fOnzE5LGqmLwDJ5Vp72VjF8AvWRrRNWxvyAGQWu4kjCG3I4hHLRA1BPw8HDMx4da6YAbxgjVNkP15vIwA+KRWCcbx8ERm1vk7iaaUoBHp07u9xrkybGagz50gFnmSivnFwrkof4ivDFVo9vTpeQFa9Ro7kVjsUcqJPsw+wOW3mpIfJMlFNNrKxPdDp/1QeKJGKkoeVz/a7zCMIxZiiJmTqL7SMTFRT6iOz8r3erhj2NLfkpzLpFKZJMhcbLd0rtvIKRFbjiLYY06bInUnRIujldtfOx8vbJ/nnFwUYIKaPepfevQ6jB43KC8JtiPyHf6/UcA0yAU5M9EL+t4sL4fyRzpEde7GarJd4FF5qkIimkS/Nso5w1hO733/Og5Lqx5PDg7+G0HrY3YXOVNbVKHXV4oPjnegcpkomcWnUwlsMORsxS995npMrc+Ouiy43M3QvpzwFMqEVMcgo8v/IgZbqz/QpYFl70MMmwHM1riyWcg4hDA3fmWdAB6u/kTGqp6tKAmJt5N+cJ6FchHqmTc0DHJGZmX41b1mQnjuZq3p+O4WVn6IgrVc/W0hTcYjWMh3IjkaTi3sQlbRUTSZL2JDfQAc+tfe2rzOQo0x8B3z3qYyxemJ+kohboi1Lqt+9U3KrxofTY7Hbp0wm/jd3wEtWx9EsM8dtzpSsTBRHr6f4zqlaxmtursSH52uj0GKS3tZWunTiOAc2Hcp9Uw82rcpDw34kSq6jZUlmui5n2nzUEQ+lW4c1s0QH7wpF/nIS9qirv8jV443i7ZsUn4c4/8RI/q47ZoDLoR8ZatjfWGhMXwtWEN/G6EgrCiNfr4w4zyAauFwpyX2x7Lj67aO/WmPhFWQXPT7ZsqRN/2c/4J2mKtHGdr+Csqm0v9u7bbH6m+vjopXS53efDd7OZSUAZj2sEAVtXjNIhEp1ch/yBH25k7J+Ts8"
+              }
+            }
+          ],
+          "model": "gemini-3.5-flash",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:39:52.591609"
+        }
+      ],
+      "created_at": "2026-08-25 13:39:52.591630",
+      "updated_at": "2026-08-25 13:39:52.591642"
+    },
+    {
+      "id": "17d5c181-5dd9-4e09-9ac4-833597cc162f",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! I'm here to help you prevent burnout and stay refreshed during your screen sessions. \n\nHow are you feeling today? Would you like a quick break tip, some calming music, or a check of your system settings?",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:44:02.361212"
+        },
+        {
+          "message": "play me some jazz music",
+          "response": "Playing jazz music for you. \ud83c\udfb5 Sit back, relax, and enjoy the tunes while you take a breather! Let me know if you need a break tip or anything else.",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:46:10.320408"
+        }
+      ],
+      "created_at": "2026-08-25 13:44:02.361239",
+      "updated_at": "2026-08-25 13:46:10.320411"
+    },
+    {
+      "id": "19c3def9-e6c0-408e-a14b-833b1deb16b8",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Play some natural bird music",
+          "response": "Playing natural bird music for you... \ud83c\udfb5",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:48:12.245241"
+        }
+      ],
+      "created_at": "2026-08-25 13:48:12.245262",
+      "updated_at": "2026-08-25 13:48:12.245274"
+    },
+    {
+      "id": "3fba436e-770d-4e1a-b5bf-502e9405b95c",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "I've checked your current system settings. Here are my recommendations to help prevent burnout and protect your well-being:\n\n- **Brightness (Currently 100%)**: Recommended to reduce to **65%** (High brightness in the evening causes eye strain and fatigue).\n- **Volume (Currently 100%)**: Recommended to reduce to **60%** (Exceeds safe listening limits for extended sessions).\n\nWould you like me to apply these optimal settings for you?",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 13:49:37.615612"
+        }
+      ],
+      "created_at": "2026-08-25 13:49:37.615632",
+      "updated_at": "2026-08-25 13:49:37.618257"
     }
   ],
   "activity": [
@@ -1415,6 +1691,23 @@
       "total_breaks_taken": 8,
       "total_breaks_skipped": 6,
       "last_updated": "2026-08-02 06:45:33.375126"
+    },
+    {
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "date": "2026-08-25",
+      "sessions": [
+        {
+          "session_duration": 1800,
+          "target_duration": 1800,
+          "completed": true,
+          "skipped": false,
+          "timestamp": "2026-08-25 11:42:43.468775"
+        }
+      ],
+      "total_session_duration": 1800,
+      "total_breaks_taken": 1,
+      "total_breaks_skipped": 0,
+      "last_updated": "2026-08-25 11:42:43.468778"
     }
   ]
 }

@@ -7,7 +7,7 @@ from services.encryption import decrypt_api_key
 from services.agent_runner import run_agent
 from datetime import datetime
 from logger import get_logger
-from routers.test_inference import FREE_MODELS
+from config.llm_providers import get_provider, list_providers_for_frontend
 
 logger = get_logger("chat")
 
@@ -53,43 +53,16 @@ async def send_message(token: str, request: ChatRequest):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
+        # Resolve provider + model from the model_key
+        provider_key, model = _resolve_model(request.model_key, user)
+
+        # Try stored key first, fall back to env vars in llm_service
+        api_key = ""
         ai_providers = user.get("ai_providers", {})
-
-        use_opencode_free = False
-        base_url = None
-
-        # Free OpenCode inference models — no stored key needed, no auth header
-        if request.model_key and request.model_key.startswith("free_"):
-            model_id = request.model_key[len("free_"):]
-            if model_id not in FREE_MODELS:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Model '{model_id}' is not an allowed free model. Available free models: {FREE_MODELS}",
-                )
-            provider_key = "opencode_free"
-            model = model_id
-            api_key = ""
-            use_opencode_free = True
-        else:
-            if not ai_providers:
-                raise HTTPException(
-                    status_code=400,
-                    detail="No AI provider configured. Please add one in Profile Settings.",
-                )
-
-            provider_key = request.model_key or list(ai_providers.keys())[0]
-            if provider_key not in ai_providers:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Model '{provider_key}' not found. Please select a valid model.",
-                )
-
-            provider_config = ai_providers[provider_key]
+        if provider_key in ai_providers:
             device_id = user.get("device_id", "")
-            api_key = decrypt_api_key(provider_config["api_key"], device_id)
-            model = provider_config["model"]
+            api_key = decrypt_api_key(ai_providers[provider_key]["api_key"], device_id)
 
-        print(f"[Chat] Provider: {provider_key}, Model: {model}, Key starts: {api_key[:12] if api_key else 'n/a'}...")
         logger.info(
             "Chat request received",
             user_id=user_id,
@@ -107,14 +80,13 @@ async def send_message(token: str, request: ChatRequest):
             system_metrics["local_hour"] = request.local_hour
 
         ai_response, recommendations, tools_used, token_usage = await run_agent(
-            api_key=api_key,
+            provider_key=provider_key,
             model=model,
+            api_key=api_key,
             user=user,
             system_metrics=system_metrics,
             message=request.message,
             conversation_history=request.conversation_history,
-            base_url=base_url,
-            use_opencode_free=use_opencode_free,
         )
 
         session_id = ""
@@ -142,26 +114,17 @@ async def send_message(token: str, request: ChatRequest):
             logger.warning("Failed to save chat history", user_id=user_id, session_id=session_id, error=str(e))
 
         # Store conversation in vector DB for semantic search.
-        # This is separate from the structured chat_history_db —
-        # vector DB enables "find similar conversations" while
-        # structured DB enables "list all sessions" and "get session messages".
         try:
             from rag.vector_store import get_user_collection, chunk_text
             from datetime import datetime as _dt
             collection = get_user_collection(user_id)
 
-            # Combine user message and AI response into one document
             doc_text = f"User: {request.message}\nAI: {ai_response}"
             timestamp = _dt.utcnow().isoformat()
 
-            # Create a unique base ID for this conversation turn.
-            # Each chunk will get: {base_id}_c0, {base_id}_c1, etc.
             base_id = f"{session_id}_{_dt.utcnow().strftime('%Y%m%d%H%M%S%f')}"
-
-            # Split long text into overlapping chunks (short text stays as one piece)
             chunks = chunk_text(doc_text)
 
-            # Batch all chunks for a single add_texts call (more efficient)
             texts_to_add = []
             ids_to_add = []
             metadatas_to_add = []
@@ -174,11 +137,9 @@ async def send_message(token: str, request: ChatRequest):
                     "session_id": session_id,
                     "timestamp": timestamp,
                     "tools_used": ",".join(tools_used) if tools_used else "",
-                    # Chunk reconstruction metadata — used by search to
-                    # reassemble all chunks from the same parent document
-                    "chunk_index": i,           # position of this chunk (0, 1, 2...)
-                    "total_chunks": len(chunks), # total chunks in this document
-                    "parent_id": base_id,        # links all chunks to same parent
+                    "chunk_index": i,
+                    "total_chunks": len(chunks),
+                    "parent_id": base_id,
                 })
 
             collection.add_texts(
@@ -187,22 +148,18 @@ async def send_message(token: str, request: ChatRequest):
                 metadatas=metadatas_to_add,
             )
         except Exception as e:
-            # Non-blocking: if vector DB fails, chat still works,
-            # just semantic search won't find this conversation
             logger.warning("Failed to store in vector DB", user_id=user_id, session_id=session_id, error=str(e))
 
-        # Model configuration info exposed to frontend for display.
-        # These values match what's hardcoded in agent/graph.py.
         model_config_info = {
             "max_tokens": 500,
             "temperature": 0.7,
-            "context_window": 4096,  # approximate for most OpenRouter models
+            "context_window": 4096,
         }
 
         return ChatResponse(
             response=ai_response,
             model=model,
-            provider="opencode_free" if use_opencode_free else "openrouter",
+            provider=provider_key,
             session_id=session_id,
             recommendations=recommendations,
             tools_used=tools_used,
@@ -215,3 +172,27 @@ async def send_message(token: str, request: ChatRequest):
     except Exception as e:
         logger.error("Chat endpoint failed", user_id=user_id if 'user_id' in locals() else None, error_type=type(e).__name__, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
+
+
+def _resolve_model(model_key: str | None, user: dict) -> tuple[str, str]:
+    """Parse model_key into (provider_key, model_id).
+
+    Accepted formats:
+      - "openrouter:<model>"    → openrouter, model
+      - "gemini:<model>"        → openrouter, google/<model> (migrated)
+      - None                    → first available provider's default model
+    """
+    if not model_key:
+        # No model selected — use first provider with a configured key
+        available = list_providers_for_frontend()
+        if available:
+            return available[0]["key"], available[0]["default_model"]
+        raise HTTPException(status_code=400, detail="No LLM providers configured. Add an API key to backend/.env.")
+
+    # Explicit provider prefix (e.g. "openrouter:gpt-4o-mini")
+    if ":" in model_key:
+        provider_key, model_id = model_key.split(":", 1)
+        get_provider(provider_key)  # validate it exists
+        return provider_key, model_id
+
+    raise HTTPException(status_code=400, detail=f"Invalid model_key format: '{model_key}'. Use 'provider:model'.")

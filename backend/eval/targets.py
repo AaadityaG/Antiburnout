@@ -32,14 +32,14 @@ async def _run_agent_async(example: dict) -> dict:
     }
 
     response, recommendations, tools_used, token_usage, tool_calls, tool_results = await run_agent(
-        api_key=config["api_key"],
+        provider_key=config["provider"],
         model=config["model"],
+        api_key=config["api_key"],
         user=user,
         system_metrics=system_metrics or None,
         message=example.get("message", ""),
         conversation_history=_to_history(example.get("conversation_history")),
         include_tool_calls=True,
-        base_url=config["base_url"],
     )
 
     return {

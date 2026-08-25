@@ -2,12 +2,9 @@ from typing import Literal
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import StateGraph, MessagesState, END
 from langgraph.prebuilt import ToolNode
-from langchain_openai import ChatOpenAI
 from datetime import datetime
 import asyncio
 import os
-
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 
 def build_system_prompt(user: dict, system_metrics: dict = None) -> str:
@@ -115,94 +112,86 @@ def should_continue(state: MessagesState) -> Literal["tools", "__end__"]:
 
 
 def create_agent_graph(
-    api_key: str,
-    model: str,
+    llm,
     user: dict,
     system_metrics: dict = None,
-    base_url: str = None,
-    use_opencode_free: bool = False,
+    provider_key: str = "",
 ):
-    if use_opencode_free:
-        from services.opencode_llm import OpenCodeFreeChatModel
+    """Build a LangGraph agent graph with the given LLM.
 
-        llm = OpenCodeFreeChatModel(model=model, temperature=0.7, max_tokens=500)
-    else:
-        base_url = base_url or os.getenv("LLM_BASE_URL") or OPENROUTER_BASE_URL
-        is_openrouter = "openrouter" in base_url
-
-        default_headers = {}
-        if is_openrouter:
-            default_headers = {
-                "HTTP-Referer": "https://antiburnout.ai",
-                "X-Title": "AntiBurnout",
-            }
-
-        llm = ChatOpenAI(
-            model=model,
-            api_key=api_key,
-            base_url=base_url,
-            max_tokens=500,
-            temperature=0.7,
-            timeout=30,
-            max_retries=1,
-            default_headers=default_headers,
-        )
-
-    from agent.tools import (
-        check_system_settings,
-        get_user_activity,
-        get_user_break_settings,
-        get_break_tip,
-        recommend_music,
-        search_knowledge_base,
-    )
-    from langchain_core.tools import tool
+    Args:
+        llm: A pre-configured LangChain BaseChatModel from llm_service.get_llm().
+        user: The user dict (for tool wrappers that need user_id).
+        system_metrics: Optional system metrics for tool context.
+        provider_key: Used to check if provider supports tools via config.
+    """
+    from config.llm_providers import provider_supports_tools
 
     user_id = user.get("id", "")
 
-    # Create a wrapper that always has the system metrics available
-    _brightness = system_metrics.get("brightness") if system_metrics else None
-    _volume = system_metrics.get("volume") if system_metrics else None
-    _local_hour = system_metrics.get("local_hour") if system_metrics else None
+    use_tools = provider_supports_tools(provider_key)
 
-    @tool
-    def check_settings_with_metrics(
-        brightness: int = _brightness if _brightness is not None else 50,
-        volume: int = _volume if _volume is not None else 50,
-        auto_apply: bool = False,
-    ) -> dict:
-        """Check if the user's current system settings (brightness, volume) are optimal for their health. Call this whenever a user asks about their settings, wellness, burnout prevention, or when they mention brightness/volume. Returns recommendations for any settings that need adjustment.
+    if use_tools:
+        from agent.tools import (
+            check_system_settings,
+            get_user_activity,
+            get_user_break_settings,
+            get_break_tip,
+            recommend_music,
+            search_knowledge_base,
+        )
+        from langchain_core.tools import tool
+
+        _brightness = system_metrics.get("brightness") if system_metrics else None
+        _volume = system_metrics.get("volume") if system_metrics else None
+        _local_hour = system_metrics.get("local_hour") if system_metrics else None
+
+        @tool
+        def check_settings_with_metrics(
+            brightness: int = _brightness if _brightness is not None else 50,
+            volume: int = _volume if _volume is not None else 50,
+            auto_apply: bool = False,
+        ) -> dict:
+            """Check if the user's current system settings (brightness, volume) are optimal for their health. Call this whenever a user asks about their settings, wellness, burnout prevention, or when they mention brightness/volume. Returns recommendations for any settings that need adjustment.
 
 Set auto_apply=True when the user explicitly asks to FIX, OPTIMIZE, APPLY, or UPDATE settings. In this case, apply the changes immediately.
 
 Set auto_apply=False when the user asks to CHECK, VIEW, or SEE settings. In this case, show the recommendations with Execute/Reject buttons for the user to confirm."""
-        from agent.tools import _local_hour_var
-        _local_hour_var.set(_local_hour)
-        return check_system_settings.invoke({
-            "brightness": brightness,
-            "volume": volume,
-            "auto_apply": auto_apply,
-        })
+            from agent.tools import _local_hour_var
+            _local_hour_var.set(_local_hour)
+            return check_system_settings.invoke({
+                "brightness": brightness,
+                "volume": volume,
+                "auto_apply": auto_apply,
+            })
 
-    @tool
-    def kb_search(query: str) -> dict:
-        """Search the user's personal knowledge base for relevant information. ONLY call this when the user has EXPLICITLY asked to search their documents, notes, or uploaded files (e.g. 'check my docs', 'what does my KB say', 'search my notes'). Do NOT call proactively for general questions."""
-        return search_knowledge_base.invoke({"user_id": user_id, "query": query})
+        @tool
+        def kb_search(query: str) -> dict:
+            """Search the user's personal knowledge base for relevant information. ONLY call this when the user has EXPLICITLY asked to search their documents, notes, or uploaded files (e.g. 'check my docs', 'what does my KB say', 'search my notes'). Do NOT call proactively for general questions."""
+            return search_knowledge_base.invoke({"user_id": user_id, "query": query})
 
-    tools = [check_settings_with_metrics, get_user_activity, get_user_break_settings, get_break_tip, recommend_music, kb_search]
-    llm_with_tools = llm.bind_tools(tools)
+        tools = [check_settings_with_metrics, get_user_activity, get_user_break_settings, get_break_tip, recommend_music, kb_search]
+        llm_with_tools = llm.bind_tools(tools)
+        tool_node = ToolNode(tools)
 
-    tool_node = ToolNode(tools)
+        async def agent_node(state: MessagesState):
+            response = await llm_with_tools.ainvoke(state["messages"])
+            return {"messages": [response]}
 
-    async def agent_node(state: MessagesState):
-        response = await llm_with_tools.ainvoke(state["messages"])
-        return {"messages": [response]}
+        graph = StateGraph(MessagesState)
+        graph.add_node("agent", agent_node)
+        graph.add_node("tools", tool_node)
+        graph.set_entry_point("agent")
+        graph.add_conditional_edges("agent", should_continue, {"tools": "tools", "__end__": END})
+        graph.add_edge("tools", "agent")
+    else:
+        async def agent_node(state: MessagesState):
+            response = await llm.ainvoke(state["messages"])
+            return {"messages": [response]}
 
-    graph = StateGraph(MessagesState)
-    graph.add_node("agent", agent_node)
-    graph.add_node("tools", tool_node)
-    graph.set_entry_point("agent")
-    graph.add_conditional_edges("agent", should_continue, {"tools": "tools", "__end__": END})
-    graph.add_edge("tools", "agent")
+        graph = StateGraph(MessagesState)
+        graph.add_node("agent", agent_node)
+        graph.set_entry_point("agent")
+        graph.add_edge("agent", END)
 
     return graph.compile()
