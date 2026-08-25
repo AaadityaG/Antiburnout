@@ -5,24 +5,8 @@
       "device_id": "2772664d8ba4248759dae1bdee97195f",
       "device_name": "Win32",
       "created_at": "2026-07-12T10:11:39.780275",
-      "last_login": "2026-08-19T07:00:29.489400",
-      "ai_providers": {
-        "model_1": {
-          "provider": "openrouter",
-          "model": "openai/gpt-4o-mini",
-          "api_key": "gAAAAABqaM27RF1WL_PLgnnjL3KRL05soMf_DCyQqplem6egH61bkx4CYQYKU5auX2dEscLvWT7H6d5u57UDVEsLx81xNm8wgnN8Ac3Qu4svZzc3M7bcNJ6CSnHyeXpZMmVp3Yiyh7cN0CgvjZoQQ5k0tA8tZSQQUyptmojThKXfqCMj0KeZ-n8="
-        },
-        "model_2": {
-          "provider": "openrouter",
-          "model": "anthropic/claude-3-haiku",
-          "api_key": "gAAAAABqaM27YxwK991A3AatoqNISQU4WGdkT8hcF4TqrpPNQpyCv3ID5NI9xyZLTSy4StYyrOv8Lsa6Tjzc2EOZs789Rg3GpoaDmc79D92j5I0vbh9Ua-BAtz1yhxMy9pTCZvLXUJwUsWVAfDVKi6f0h3u5nTC9TM2GoIrxni4d_9hd8ZO4v28="
-        },
-        "model_3": {
-          "provider": "openrouter",
-          "model": "meta-llama/llama-3.1-70b-instruct",
-          "api_key": "gAAAAABqaM27ciR3vrUmD4AbXz4YS_f4PAYom4YfpAc9yqzPL_bmeD0zy_NM0_UySXUJevUDKWBRMtqhGeHVbFmN4xVUM6oPtucuV_bIdyIu5gbhPmXa-GHLraq1RzG-wVLQo0fyF9lxSP_FClH2Snq76CDmB_s-5C_oRHIn74QQlyP5SUSbqGQ="
-        }
-      },
+      "last_login": "2026-08-19T09:22:56.378361",
+      "ai_providers": {},
       "profile_completed": true,
       "name": "Aditya"
     },
@@ -919,6 +903,51 @@
       ],
       "created_at": "2026-08-02 05:31:03.901748",
       "updated_at": "2026-08-02 05:31:03.901752"
+    },
+    {
+      "id": "bf6cd9c8-0949-4ecc-a525-f8a373ad53d4",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! How can I assist you today in preventing digital burnout and maintaining your wellness?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-08-19 09:33:43.702548"
+        }
+      ],
+      "created_at": "2026-08-19 09:33:43.702559",
+      "updated_at": "2026-08-19 09:33:43.702565"
+    },
+    {
+      "id": "7fa87102-45e5-47b8-9d79-3bbc58c0a496",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "Your current settings are as follows:\n\n- **Brightness**: Optimal\n- **Volume**: Needs adjustment (currently at 68%, recommended at 60% for long sessions)\n\nWould you like to decrease the volume to 60% to help reduce potential burnout? You can choose to apply the change or reject it.",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-08-19 09:33:56.917178"
+        }
+      ],
+      "created_at": "2026-08-19 09:33:56.917188",
+      "updated_at": "2026-08-19 09:33:56.917195"
+    },
+    {
+      "id": "e3afc4e2-b2e3-49d2-96ef-d530a8d5d65b",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! How can I assist you today in preventing digital burnout or maintaining your wellness?",
+          "model": "openai/gpt-4o-mini",
+          "provider_key": "model_1",
+          "timestamp": "2026-08-25 07:04:07.147974"
+        }
+      ],
+      "created_at": "2026-08-25 07:04:07.147977",
+      "updated_at": "2026-08-25 07:04:07.147979"
     }
   ],
   "activity": [

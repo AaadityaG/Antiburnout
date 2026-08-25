@@ -38,7 +38,7 @@ uvicorn main:app --host 0.0.0.0 --port 8010   # http://localhost:8010
 One-liner (PowerShell — activates venv and starts backend on 8010):
 
 ```powershell
-cd backend; & .\venv\Scripts\Activate.ps1; uvicorn main:app --host 0.0.0.0 --port 8010
+cd backend; & .\venv\Scripts\Activate.ps1; uvicorn main:app --host 0.0.0.0 --port 8010 --reload
 ```
 
 ### Frontend
