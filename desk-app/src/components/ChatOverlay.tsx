@@ -69,7 +69,6 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
   useEffect(() => {
     if (isOpen && token) {
       dispatch(fetchSessions(token))
-      dispatch(fetchKBDocuments(token))
     }
   }, [isOpen, token, dispatch])
 
@@ -304,9 +303,11 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
     if (value === '/kb') {
       setShowKbDropdown(true)
       setKbFilter('')
+      if (kbDocuments.length === 0) dispatch(fetchKBDocuments(token))
     } else if (value.startsWith('/kb ')) {
       setShowKbDropdown(true)
       setKbFilter(value.slice(4).toLowerCase())
+      if (kbDocuments.length === 0) dispatch(fetchKBDocuments(token))
     } else {
       setShowKbDropdown(false)
     }
