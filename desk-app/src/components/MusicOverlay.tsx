@@ -37,10 +37,12 @@ interface MusicOverlayProps {
   currentTrack: Video | null
   isPlaying: boolean
   isMuted: boolean
+  volume: number
   playerTime: { current: number; duration: number }
   onPlayTrack: (track: Video, trackList?: Video[], index?: number, mood?: string) => void
   onTogglePlay: () => void
   onToggleMute: () => void
+  onVolumeChange: (vol: number) => void
   onSeek: (seconds: number) => void
   onNext: () => void
   onPrev: () => void
@@ -54,7 +56,7 @@ function formatTime(s: number) {
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
 
-function MusicOverlay({ isOpen, onClose, currentTrack, isPlaying, isMuted, playerTime, onPlayTrack, onTogglePlay, onToggleMute, onSeek, onNext, onPrev, onStop }: MusicOverlayProps) {
+function MusicOverlay({ isOpen, onClose, currentTrack, isPlaying, isMuted, volume, playerTime, onPlayTrack, onTogglePlay, onToggleMute, onVolumeChange, onSeek, onNext, onPrev, onStop }: MusicOverlayProps) {
   const [selectedMood, setSelectedMood] = useState<MoodOption | null>(null)
   const [tracks, setTracks] = useState<Video[]>([])
   const [loading, setLoading] = useState(false)
@@ -236,25 +238,46 @@ function MusicOverlay({ isOpen, onClose, currentTrack, isPlaying, isMuted, playe
                 </motion.button>
               </div>
 
-              {/* Bottom Row: Mute + Stop */}
-              <div className="px-10 pb-6 flex items-center justify-center gap-4">
+              {/* Bottom Row: Volume + Mute + Stop */}
+              <div className="px-10 pb-6 flex items-center gap-3">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onToggleMute}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/70 transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/70 transition-colors shrink-0 cursor-pointer"
                 >
-                  {isMuted ? (
+                  {isMuted || volume === 0 ? (
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                  ) : volume < 50 ? (
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                   ) : (
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                   )}
                 </motion.button>
+                <div className="flex-1 relative group">
+                  <div className="h-1.5 rounded-full bg-white/10">
+                    <div className="h-full rounded-full bg-accent/60 transition-all" style={{ width: `${isMuted ? 0 : volume}%` }} />
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={isMuted ? 0 : volume}
+                    onChange={(e) => onVolumeChange(parseInt(e.target.value))}
+                    className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                    style={{ margin: 0, height: '100%' }}
+                  />
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-accent shadow-[0_0_6px_rgba(212,252,212,0.4)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    style={{ left: `calc(${isMuted ? 0 : volume}% - 6px)` }}
+                  />
+                </div>
+                <span className="text-xs text-white/25 tabular-nums w-8 text-right shrink-0">{isMuted ? 0 : volume}%</span>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onStop}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 transition-colors shrink-0 cursor-pointer"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </motion.button>

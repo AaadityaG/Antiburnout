@@ -53,6 +53,7 @@ function App() {
   const [currentTrack, setCurrentTrack] = useState<Video | null>(null)
   const [isMusicPlaying, setIsMusicPlaying] = useState(false)
   const [isMusicMuted, setIsMusicMuted] = useState(false)
+  const [musicVolume, setMusicVolume] = useState(70)
   const [playlist, setPlaylist] = useState<Video[]>([])
   const [playlistIndex, setPlaylistIndex] = useState(-1)
   const [playerTime, setPlayerTime] = useState({ current: 0, duration: 0 })
@@ -163,6 +164,7 @@ function App() {
               const p = ytPlayerRef.current
               p.setPlaybackQuality('highres')
               p.setOption('captions', 'track', {})
+              p.setVolume(70)
               refreshQualityLevels()
             } catch {}
             setIsMusicPlaying(true)
@@ -241,6 +243,19 @@ function App() {
       ytPlayerRef.current.mute()
     }
     setIsMusicMuted(!isMusicMuted)
+  }, [isMusicMuted])
+
+  const handleSetMusicVolume = useCallback((vol: number) => {
+    if (!ytPlayerRef.current) return
+    ytPlayerRef.current.setVolume(vol)
+    setMusicVolume(vol)
+    if (vol === 0) {
+      ytPlayerRef.current.mute()
+      setIsMusicMuted(true)
+    } else if (isMusicMuted) {
+      ytPlayerRef.current.unMute()
+      setIsMusicMuted(false)
+    }
   }, [isMusicMuted])
 
   const handleNextTrack = useCallback(() => {
@@ -648,10 +663,12 @@ function App() {
         currentTrack={currentTrack}
         isPlaying={isMusicPlaying}
         isMuted={isMusicMuted}
+        volume={musicVolume}
         playerTime={playerTime}
         onPlayTrack={handlePlayTrack}
         onTogglePlay={handleToggleMusicPlay}
         onToggleMute={handleToggleMute}
+        onVolumeChange={handleSetMusicVolume}
         onSeek={handleSeek}
         onNext={handleNextTrack}
         onPrev={handlePrevTrack}
