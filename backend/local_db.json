@@ -1224,6 +1224,58 @@
       ],
       "created_at": "2026-08-25 13:49:37.615632",
       "updated_at": "2026-08-25 13:49:37.618257"
+    },
+    {
+      "id": "5ba01c89-0933-485e-9992-35190428c61b",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "hi",
+          "response": "Hello! I'm your AntiBurnout Assistant. How are you feeling today? Let me know if you need a break tip, some calming music, or want to check your system settings to protect your eyes and ears during your screen session.",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 14:02:12.564250"
+        },
+        {
+          "message": "who is the president of the us",
+          "response": "I'm your AntiBurnout Assistant, focused on helping you prevent digital burnout, maintain wellness, and manage your screen time! I'm best equipped to help with wellness tips, break schedules, music, and system settings. \n\nFor general knowledge questions like the US president, I recommend checking a news or search source. How can I help you stay healthy and relaxed during your screen session today?",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 14:02:44.292099"
+        }
+      ],
+      "created_at": "2026-08-25 14:02:12.564276",
+      "updated_at": "2026-08-25 14:02:44.292108"
+    },
+    {
+      "id": "be3f4135-dbcd-45b1-9486-02274a6b17af",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "I'm feeling tired",
+          "response": "It sounds like you've been working hard and your body is asking for a pause. Since you're feeling tired, let's take a quick breather to recharge! \n\nWould you like a quick wellness break tip, or perhaps some calming music to help you rest and reset?",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 14:08:23.595948"
+        }
+      ],
+      "created_at": "2026-08-25 14:08:23.595966",
+      "updated_at": "2026-08-25 14:08:23.595976"
+    },
+    {
+      "id": "8ed3a06e-e9e6-45dd-b21e-b4cb667cdcfb",
+      "user_id": "97d95d5c-daf6-4371-bea7-2ccbf4524d5f",
+      "messages": [
+        {
+          "message": "Check my current settings if they are good for less burnout",
+          "response": "Your current settings need a few adjustments for optimal wellness:\n\n\u2022 **Brightness (100%):** A bit high, especially in the evening. Recommended: **65%** to reduce eye strain.\n\u2022 **Volume (79%):** Exceeds the safe listening limit. Recommended: **60%** to protect your hearing.\n\nWould you like me to apply these optimal settings for you?",
+          "model": "gemini-3.5-flash-lite",
+          "provider_key": "gemini",
+          "timestamp": "2026-08-25 14:08:50.715794"
+        }
+      ],
+      "created_at": "2026-08-25 14:08:50.715801",
+      "updated_at": "2026-08-25 14:08:50.715805"
     }
   ],
   "activity": [

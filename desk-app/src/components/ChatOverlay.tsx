@@ -17,6 +17,71 @@ interface ChatOverlayProps {
   onPlayMusic?: (mood: string, query?: string) => void
 }
 
+const TOOL_LABELS: Record<string, string> = {
+  check_system_settings: 'Checking system settings',
+  get_user_activity: 'Fetching activity data',
+  get_user_break_settings: 'Fetching break schedule',
+  get_break_tip: 'Generating break tip',
+  recommend_music: 'Finding music',
+  kb_search: 'Searching knowledge base',
+}
+
+function ThinkingSteps({ steps }: { steps: { type: string; tool?: string; args?: string; summary?: string }[] }) {
+  const [expanded, setExpanded] = useState(false)
+
+  if (steps.length === 0) return null
+
+  return (
+    <div className="mt-2 pt-2 border-t border-white/[0.06]">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-2 text-[11px] text-white/30 hover:text-white/50 transition-colors cursor-pointer"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${expanded ? 'rotate-90' : ''}`}>
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+        <span>Reasoning ({steps.length} step{steps.length !== 1 ? 's' : ''})</span>
+      </button>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-2 space-y-1.5">
+              {steps.map((step, i) => (
+                <div key={i} className="flex items-start gap-2 text-[11px]">
+                  {step.type === 'tool_call' ? (
+                    <>
+                      <span className="text-accent/60 shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                      </span>
+                      <span className="text-white/40">
+                        {TOOL_LABELS[step.tool || ''] || step.tool}
+                        {step.args && <span className="text-white/20">({step.args})</span>}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-green-400/60 shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      <span className="text-white/30">{step.summary}</span>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { token } = useSelector((state: RootState) => state.auth)
@@ -33,6 +98,7 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
     token_usage?: { input_tokens: number; output_tokens: number; total_tokens: number };
     model_config_info?: { max_tokens: number; temperature: number; context_window: number };
     model?: string;
+    thinking_steps?: { type: string; tool?: string; args?: string; summary?: string }[];
   }>>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -259,6 +325,7 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
         token_usage: response.data.token_usage || undefined,
         model_config_info: response.data.model_config_info || undefined,
         model: response.data.model || undefined,
+        thinking_steps: response.data.thinking_steps || [],
       }])
 
       if (response.data.session_id && !activeSessionId) {
@@ -663,6 +730,11 @@ function ChatOverlay({ isOpen, onClose, onPlayMusic }: ChatOverlayProps) {
                     >
                       <div className={`max-w-[80%] px-6 py-4 rounded-2xl text-base leading-relaxed text-left whitespace-pre-wrap ${msg.role === 'user' ? 'bg-accent/15 border border-accent/25 text-white rounded-br-md' : 'bg-white/[0.04] border border-white/[0.06] text-green-200/80 rounded-bl-md'}`}>
                         {msg.content}
+
+                        {/* Thinking steps */}
+                        {msg.thinking_steps && msg.thinking_steps.length > 0 && msg.role === 'assistant' && (
+                          <ThinkingSteps steps={msg.thinking_steps} />
+                        )}
 
                         {/* Tool usage indicators */}
                         {msg.tools_used && msg.tools_used.length > 0 && (

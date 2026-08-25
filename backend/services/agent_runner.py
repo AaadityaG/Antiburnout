@@ -139,6 +139,31 @@ async def run_agent(
     if not ai_response:
         ai_response = "I'm here to help you stay well! What's on your mind?"
 
+    # Build thinking steps from the message chain
+    thinking_steps = []
+    for msg in final_state["messages"]:
+        if isinstance(msg, AIMessage) and msg.tool_calls:
+            for tc in msg.tool_calls:
+                name = tc.get("name", "")
+                args = tc.get("args", {})
+                args_str = ", ".join(f"{k}={v!r}" for k, v in args.items()) if isinstance(args, dict) else ""
+                thinking_steps.append({"type": "tool_call", "tool": name, "args": args_str})
+        if isinstance(msg, ToolMessage):
+            name = getattr(msg, "name", "")
+            content = msg.content
+            if isinstance(content, str):
+                try:
+                    import json
+                    content = json.loads(content)
+                except Exception:
+                    pass
+            summary = ""
+            if isinstance(content, dict):
+                summary = content.get("message", content.get("summary", str(content)[:200]))
+            else:
+                summary = str(content)[:200]
+            thinking_steps.append({"type": "tool_result", "tool": name, "summary": summary})
+
     logger.info(
         "Agent run complete",
         model=model,
@@ -150,6 +175,6 @@ async def run_agent(
     )
 
     if include_tool_calls:
-        return ai_response, recommendations, tools_used, token_usage, tool_calls, tool_results
+        return ai_response, recommendations, tools_used, token_usage, tool_calls, tool_results, thinking_steps
 
-    return ai_response, recommendations, tools_used, token_usage
+    return ai_response, recommendations, tools_used, token_usage, thinking_steps

@@ -38,6 +38,7 @@ class ChatResponse(BaseModel):
     tools_used: Optional[List[str]] = []
     token_usage: Optional[dict] = None
     model_config_info: Optional[dict] = None
+    thinking_steps: Optional[List[dict]] = []
 
 
 @router.post("/send", response_model=ChatResponse)
@@ -79,7 +80,7 @@ async def send_message(token: str, request: ChatRequest):
         if request.local_hour is not None:
             system_metrics["local_hour"] = request.local_hour
 
-        ai_response, recommendations, tools_used, token_usage = await run_agent(
+        ai_response, recommendations, tools_used, token_usage, thinking_steps = await run_agent(
             provider_key=provider_key,
             model=model,
             api_key=api_key,
@@ -165,6 +166,7 @@ async def send_message(token: str, request: ChatRequest):
             tools_used=tools_used,
             token_usage=token_usage if token_usage else None,
             model_config_info=model_config_info,
+            thinking_steps=thinking_steps,
         )
 
     except HTTPException:
